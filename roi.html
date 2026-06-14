@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ROI · Business Case — Driver Portal</title>
+<meta name="description" content="מודל החזר השקעה משוער — חיסכון של ~₪84K בשנה, ~5,000 שעות נהג. הנחות מתועדות." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FAFAF7; --ink: #14213D; --text: #1F2937; --muted: #6B7280;
+  --rule: #D1D5DB; --rule-dim: #E5E7EB; --accent: #B45309; --card: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', system-ui, sans-serif; background: var(--paper); color: var(--text); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+.narrow { max-width: 760px; }
+.mast { border-bottom: 1px solid var(--rule-dim); padding: 18px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+.mast-inner { display: flex; justify-content: space-between; align-items: center; }
+.back { color: var(--accent); }
+.back:hover { text-decoration: underline; }
+.hero { padding: 64px 0 40px; border-bottom: 1px solid var(--rule); }
+.eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 500; }
+.h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: clamp(32px, 5vw, 52px); line-height: 1.1; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 20px; }
+.lead { font-family: 'Frank Ruhl Libre', serif; font-size: clamp(18px, 2.2vw, 22px); line-height: 1.55; color: var(--text); max-width: 720px; }
+section { padding: 56px 0; border-bottom: 1px solid var(--rule-dim); }
+.h2 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 28px; color: var(--ink); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
+.h3 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 18px; color: var(--ink); margin-top: 24px; margin-bottom: 8px; }
+p { font-size: 16px; line-height: 1.75; color: var(--text); margin-bottom: 14px; }
+p strong { color: var(--ink); font-weight: 600; }
+
+.numbers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin: 32px 0 28px; }
+@media (max-width: 760px) { .numbers { grid-template-columns: 1fr; gap: 28px; } }
+.number-block { border-top: 1px solid var(--ink); padding-top: 16px; }
+.number-big { font-family: 'Frank Ruhl Libre', serif; font-size: clamp(38px, 6vw, 58px); font-weight: 700; color: var(--ink); line-height: 1; letter-spacing: -0.02em; margin-bottom: 10px; }
+.number-label { font-size: 14px; color: var(--text); line-height: 1.4; }
+
+/* Assumption table */
+table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+th, td { padding: 12px 14px; text-align: right; border-bottom: 1px solid var(--rule-dim); }
+th { background: var(--ink); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; }
+td.num { font-family: 'JetBrains Mono', monospace; font-weight: 500; color: var(--ink); text-align: left; direction: ltr; }
+tr:last-child td { border-bottom: none; }
+tr.total td { font-weight: 700; background: #FEF3C7; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
+
+.caveat { background: #FEF3C7; border-right: 3px solid var(--accent); padding: 16px 20px; font-size: 14px; line-height: 1.7; margin-top: 24px; }
+
+footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="container mast-inner">
+    <span><a class="back" href="index.html">← חזרה ל-Case Study</a></span>
+    <span>05 · ROI</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="container narrow">
+    <div class="eyebrow">Artifact 05 · Business Case</div>
+    <h1 class="h1">מודל ROI — חיסכון משוער, הנחות מתועדות</h1>
+    <p class="lead">
+      זה לא תחזית. זה מודל מתודולוגי שמראה איך אנליסט מתרגם שיפור תהליכי לכסף — שעת עבודה אחר שעת עבודה, עם הנחות שכל אחד יכול לאתגר. (BRD §9)
+    </p>
+  </div>
+</header>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">השורה התחתונה</h2>
+
+    <div class="numbers">
+      <div class="number-block">
+        <div class="number-big">~₪84K</div>
+        <div class="number-label">חיסכון שנתי משוער<br/>בשעות מוקד תפעולי</div>
+      </div>
+      <div class="number-block">
+        <div class="number-big">~800h</div>
+        <div class="number-label">שעות מוקד שנחסכות<br/>מאוטומציה של תיאומים</div>
+      </div>
+      <div class="number-block">
+        <div class="number-big">~5,000h</div>
+        <div class="number-label">סך זמן נהגים שנחסך<br/>על פני מאות עובדים</div>
+      </div>
+    </div>
+
+    <div class="caveat">
+      <strong>קודם כל — מה זה לא:</strong> אלה לא מספרים שנגזרו מנתוני תפעול של ארגון ספציפי. אלה הערכות מודולריות שנבנו על בסיס הנחות שמתועדות למטה. <strong>מה זה כן:</strong> תרגיל אנליטי שמראה איך לבנות business case מבוסס היגיון — מיומנות ליבה של אנליסט עסקי.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">מודול 1 — חיסכון בשעות מוקד תפעולי</h2>
+    <p>המוקד התפעולי שורף שיחות יומיות על תיאומי מוניות. כל שיחה ~3 דקות ממוצע, וקיימת תוספת על הסחת דעת בין שיחות. ה-Portal מאוטמט את הזרימה — נהג מבקש, רכב נקצה, מוקד מאשר רק חריגים.</p>
+
+    <table>
+      <thead><tr><th>פרמטר</th><th>ערך</th><th>הנחה</th></tr></thead>
+      <tbody>
+        <tr><td>שיחות תיאום מונית ביום</td><td class="num">~60</td><td>מבוסס על אומדן תפעולי, נדרש אימות</td></tr>
+        <tr><td>זמן ממוצע לשיחה (כולל context-switch)</td><td class="num">~3.5 דק'</td><td>2 דק' שיחה + 1.5 דק' רישום ומעקב</td></tr>
+        <tr><td>אחוז שניתן לאוטמט מלא</td><td class="num">~70%</td><td>שאר 30% חריגים שדורשים אדם</td></tr>
+        <tr><td>ימי עבודה בשנה</td><td class="num">250</td><td>נכון ל-shift תפעולי</td></tr>
+        <tr><td>עלות שעת עובד מוקד (העמסה מלאה)</td><td class="num">~₪105</td><td>שכר + מסים + תקורה, ברוטו ל-מעביד</td></tr>
+        <tr class="total"><td>חיסכון שנתי משוער</td><td class="num">~₪83,895</td><td>= 60 × 3.5 × 0.7 × 250 × ₪105 ÷ 60</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">מודול 2 — חיסכון בזמן נהגים</h2>
+    <p>נהג שעובר על 4 ערוצי תקשורת בכל בוקר (אימייל, וואטסאפ, SMS, נייר) מבזבז זמן שלא מתחלף לערך. ה-Portal מרכז הכל למסך אחד.</p>
+
+    <table>
+      <thead><tr><th>פרמטר</th><th>ערך</th><th>הנחה</th></tr></thead>
+      <tbody>
+        <tr><td>נהגים פעילים</td><td class="num">~400</td><td>סדר גודל לארגון תפעולי בקנה מידה לאומי</td></tr>
+        <tr><td>זמן יומי על בדיקת ערוצים</td><td class="num">~8-12 דק'</td><td>שמרני; ימי שינוי הם גבוהים יותר</td></tr>
+        <tr><td>זמן שנחסך בערוץ מאוחד</td><td class="num">~75%</td><td>15% נשארים — בדיקה ראשונית ואישור קבלה</td></tr>
+        <tr><td>ימי עבודה ממוצע לנהג בשנה</td><td class="num">~220</td><td>בניכוי חופשות, חגים, סופ"ש</td></tr>
+        <tr class="total"><td>סך זמן נחסך לכל הנהגים</td><td class="num">~4,950 שעות</td><td>= 400 × 10 × 0.75 × 220 ÷ 60</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 18px;"><strong>שווי זמן הנהגים:</strong> לא הוכנס לחישוב ה-₪. נהגים מקבלים שעה לחודש, לא לפי פרודוקטיביות. אבל הזמן הזה <strong>הולך לאיכות החיים שלהם</strong> — וזה ערך אמיתי שלא חייב להיות בש"ח כדי להיות שווה לאמירה.</p>
+  </div>
+</section>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">מה לא נכלל במודל</h2>
+    <h3 class="h3">צד עלות</h3>
+    <p>פיתוח, רישוי, תשתית cloud, אחזקה שוטפת, training — לא חושבו. מטרת המודל היא להעריך את ה-<strong>upside</strong>, לא ROI נטו. עלות הפרויקט תושווה רק כשתהיה הצעת מחיר ממשית.</p>
+    <h3 class="h3">צד הכנסה</h3>
+    <p>שיפור פנימי לא מייצר הכנסה ישירה. אבל הפחתת שגיאות תפעוליות (מפספסי משמרת, איחורים) שווה כסף — לא נכנסה למודל כי הקושי לכמת אותה גבוה מדי לפורמט הזה.</p>
+
+    <div class="caveat">
+      <strong>איך אנליסט קורא את המודל הזה:</strong> "טעות פוטנציאלית גדולה ב-20% עדיין משאירה ROI חיובי משמעותי." זה לא תחזית מדויקת — זה <strong>תרגיל סבירות</strong>. ההפרדה בין מה שמדיד למה שמשוער היא חלק קריטי מתפקיד האנליסט.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container narrow">
+    <p>חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026</p>
+    <p style="margin-top: 8px;"><a class="back" href="index.html">← חזרה ל-Case Study</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

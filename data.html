@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ERD · מודל הנתונים הלוגי — Driver Portal</title>
+<meta name="description" content="6 ישויות, יחסים, וניתוח נורמליזציה — דף הסבר ל-ERD של פרויקט Driver Portal." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FAFAF7; --ink: #14213D; --text: #1F2937; --muted: #6B7280;
+  --rule: #D1D5DB; --rule-dim: #E5E7EB; --accent: #B45309; --card: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', system-ui, sans-serif; background: var(--paper); color: var(--text); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+.narrow { max-width: 760px; }
+.mast { border-bottom: 1px solid var(--rule-dim); padding: 18px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+.mast-inner { display: flex; justify-content: space-between; align-items: center; }
+.back { color: var(--accent); }
+.back:hover { text-decoration: underline; }
+.hero { padding: 64px 0 40px; border-bottom: 1px solid var(--rule); }
+.eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 500; }
+.h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: clamp(32px, 5vw, 52px); line-height: 1.1; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 20px; }
+.lead { font-family: 'Frank Ruhl Libre', serif; font-size: clamp(18px, 2.2vw, 22px); line-height: 1.55; color: var(--text); max-width: 720px; }
+section { padding: 56px 0; border-bottom: 1px solid var(--rule-dim); }
+.h2 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 28px; color: var(--ink); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
+.h3 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 18px; color: var(--ink); margin-top: 24px; margin-bottom: 8px; }
+p { font-size: 16px; line-height: 1.75; color: var(--text); margin-bottom: 14px; }
+p strong { color: var(--ink); font-weight: 600; }
+
+/* ERD diagram image */
+.erd-wrap {
+  background: #0a0e1a;
+  border: 1px solid var(--ink);
+  padding: 24px;
+  margin: 24px 0 8px;
+  text-align: center;
+}
+.erd-wrap img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.erd-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+/* Entity explanation cards */
+.entity-block {
+  border-top: 2px solid var(--ink);
+  padding: 22px 0 10px;
+  margin-top: 28px;
+}
+.entity-block:first-of-type { margin-top: 12px; }
+.entity-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+.entity-name {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.entity-tag {
+  color: var(--muted);
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 14px;
+}
+.entity-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 24px;
+  background: var(--card);
+  border: 1px solid var(--rule-dim);
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  direction: ltr;
+}
+@media (max-width: 600px) { .entity-fields { grid-template-columns: 1fr; } }
+.entity-fields .f {
+  display: grid;
+  grid-template-columns: 50px 1fr 60px;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--rule-dim);
+  align-items: center;
+}
+.entity-fields .f:last-child { border-bottom: none; }
+.entity-fields .type { color: var(--muted); }
+.entity-fields .name { color: var(--ink); font-weight: 500; }
+.entity-fields .key { color: var(--accent); font-size: 10px; text-align: right; }
+
+.caveat { background: #FEF3C7; border-right: 3px solid var(--accent); padding: 14px 18px; font-size: 14px; line-height: 1.6; margin-top: 24px; }
+
+footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="container mast-inner">
+    <span><a class="back" href="index.html">← חזרה ל-Case Study</a></span>
+    <span>03 · DATA</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="container narrow">
+    <div class="eyebrow">Artifact 03 · Conceptual Data Model</div>
+    <h1 class="h1">ERD — מודל הנתונים הלוגי</h1>
+    <p class="lead">
+      שש ישויות, חמישה יחסים, ובחירות נורמליזציה שמשרתות את שלוש הזרימות העיקריות של ה-Portal: סידור עבודה, הודעות תפעוליות, ובקשות חופשה. כל ישות נכנסה למודל כי תהליך עסקי דרש אותה — לא להפך.
+    </p>
+  </div>
+</header>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">המודל — תמונה אחת</h2>
+    <p>הישויות והיחסים ביניהן, ברמת הקונספט. ה-Portal לא מחזיק מערכת מקור — הוא משכבת על מערכות קיימות (Scheduling, HR, Dispatch) ומחזיק רק את מה שנדרש לזרימות שלו.</p>
+
+    <div class="erd-wrap">
+      <img src="erd.png" alt="ERD — מודל נתונים קונספטואלי, שש ישויות ויחסיהן" />
+    </div>
+    <div class="erd-caption">Figure 1 · Conceptual Entity Relationship Diagram</div>
+
+    <div class="caveat" style="margin-top: 28px;">
+      <strong>הערה על שמות המפתחות (קריאת ה-ERD):</strong><br/>
+      ככלל, כל FK שומר את <strong>אותו שם</strong> כמו ה-PK שאליו הוא מצביע — לדוגמה <code>SHIFT.driver_id</code> מצביע על <code>DRIVER.driver_id</code>, <code>TAXI_REQUEST.shift_id</code> מצביע על <code>SHIFT.shift_id</code>. זה מבטיח שכל קורא מבין באיזה קישור מדובר ללא ספק.
+      <br/><br/>
+      <strong>היוצא דופן:</strong> כשטבלה מתייחסת לאותה ישות בכמה תפקידים, ה-FK מקבל שם תפקיד — לא שם הישות. בדיוק כפי שבמסמך משפטי "מבקש" ו"מאשר" לא נקראים שניהם "צד". במודל הזה:
+      <ul style="margin: 8px 18px 0;">
+        <li style="margin-bottom: 4px;"><code>MESSAGE.sender_id</code> → DRIVER בתפקיד <strong>שולח</strong> (לא נמען — אלה דרך ACKNOWLEDGMENT_LOG)</li>
+        <li><code>LEAVE_REQUEST.approver_id</code> → DRIVER בתפקיד <strong>מאשר</strong> (לצד <code>driver_id</code> שהוא ה<strong>מבקש</strong>; שתי שורות מאותה טבלה לאותו יעד, בלתי אפשרי לזהות בלי שמות תפקיד).</li>
+      </ul>
+      <br/>
+      בתווית הקשר ב-ERD מופיע השם של ה-FK בפועל ("via sender_id") — כדי שהקורא לעולם לא יצטרך לנחש איך החיבור נעשה.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">הסבר על כל ישות</h2>
+
+    <div class="entity-block">
+      <div class="entity-num">E1</div>
+      <div class="entity-name">DRIVER</div>
+      <div class="entity-tag">הנהג — הגורם המרכזי במודל</div>
+      <p>פרופיל הנהג: שם, מספר עובד (MIRS), דיפו, פלאפון, וקישור חיצוני ל-HR System. כל הזרימות במערכת מתחילות מזיהוי הנהג. ה-<code>hr_external_id</code> הוא ה-FK ל-HR System of Record — לא מחזיקים יתרת חופשה או תלוש שכר ב-Portal, רק את המפתח.</p>
+      <div class="entity-fields">
+        <div class="f"><span class="type">int</span><span class="name">driver_id</span><span class="key">PK</span></div>
+        <div class="f"><span class="type">string</span><span class="name">name</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">mirs_id</span><span class="key">UNIQUE</span></div>
+        <div class="f"><span class="type">string</span><span class="name">depot</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">phone</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">hr_external_id</span><span class="key">FK</span></div>
+      </div>
+    </div>
+
+    <div class="entity-block">
+      <div class="entity-num">E2</div>
+      <div class="entity-name">SHIFT</div>
+      <div class="entity-tag">משמרת בודדת של נהג ביום נתון</div>
+      <p>סידור היומי — לכל נהג ביום אחד יכולה להיות משמרת אחת בלבד (UNIQUE על שילוב driver+date). שדה <code>shift_type</code> מטפל בערכים: בוקר, צהריים, לילה, חופש, כוננות, מוכן. <code>instructor_name</code> מאוכלס רק במשמרות הדרכה — שמירת השדה ברמת ה-SHIFT (ולא טבלה נפרדת) נכונה כי הוא תלוי-משמרת, לא תלוי-נהג.</p>
+      <div class="entity-fields">
+        <div class="f"><span class="type">int</span><span class="name">shift_id</span><span class="key">PK</span></div>
+        <div class="f"><span class="type">int</span><span class="name">driver_id</span><span class="key">FK</span></div>
+        <div class="f"><span class="type">date</span><span class="name">shift_date</span><span class="key"></span></div>
+        <div class="f"><span class="type">time</span><span class="name">start_time</span><span class="key"></span></div>
+        <div class="f"><span class="type">time</span><span class="name">end_time</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">start_station</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">shift_type</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">instructor_name</span><span class="key"></span></div>
+      </div>
+    </div>
+
+    <div class="entity-block">
+      <div class="entity-num">E3</div>
+      <div class="entity-name">TAXI_REQUEST</div>
+      <div class="entity-tag">בקשת הסעה — מקושרת אופציונלית למשמרת</div>
+      <p>לא כל משמרת דורשת הסעה. הפרדה לישות נפרדת מאפשרת לעדכן את ה-status של הבקשה (נוצרה, שובץ רכב, בדרך, הגיע, בוטל) <strong>בלי לגעת ברשומת המשמרת</strong> — חשוב כי המשמרת היא רשומה יציבה תפעולית, והבקשה משתנה תכופות.</p>
+      <div class="entity-fields">
+        <div class="f"><span class="type">int</span><span class="name">request_id</span><span class="key">PK</span></div>
+        <div class="f"><span class="type">int</span><span class="name">shift_id</span><span class="key">FK</span></div>
+        <div class="f"><span class="type">string</span><span class="name">pickup_location</span><span class="key"></span></div>
+        <div class="f"><span class="type">time</span><span class="name">pickup_time</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">vehicle_id</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">status</span><span class="key"></span></div>
+        <div class="f"><span class="type">datetime</span><span class="name">last_updated</span><span class="key"></span></div>
+      </div>
+    </div>
+
+    <div class="entity-block">
+      <div class="entity-num">E4</div>
+      <div class="entity-name">MESSAGE</div>
+      <div class="entity-tag">הודעה תפעולית — נשלחת לקבוצה</div>
+      <p>הודעה אחת יכולה להישלח לקהל — קו ספציפי, דיפו, או כל הנהגים הפעילים. <code>audience_filter</code> נשמר כשאילתה, לא כרשימה — כדי שהקהל יחושב מחדש בכל פעם (לדוגמה, אם נהג נוסף לקו אחרי שליחת ההודעה). <code>requires_ack</code> משמש לציון הודעות בטיחות שמחייבות אישור קריאה מפורש.</p>
+      <div class="entity-fields">
+        <div class="f"><span class="type">int</span><span class="name">message_id</span><span class="key">PK</span></div>
+        <div class="f"><span class="type">int</span><span class="name">sender_id</span><span class="key">FK</span></div>
+        <div class="f"><span class="type">string</span><span class="name">audience_type</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">audience_filter</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">body</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">priority</span><span class="key"></span></div>
+        <div class="f"><span class="type">bool</span><span class="name">requires_ack</span><span class="key"></span></div>
+        <div class="f"><span class="type">datetime</span><span class="name">sent_at</span><span class="key"></span></div>
+      </div>
+    </div>
+
+    <div class="entity-block">
+      <div class="entity-num">E5</div>
+      <div class="entity-name">ACKNOWLEDGMENT_LOG</div>
+      <div class="entity-tag">תיעוד אישור קריאה — לוג רב-מימדי</div>
+      <p>זה הקטע שבו הפכתי קשר N:M בין הודעה לנהגים לטבלה משלו. כל הודעה נשלחת לקבוצה, וכל נהג בקבוצה צריך לאשר אותה <strong>בנפרד</strong>. הוצאת ה-log לטבלה נפרדת מאפשרת לדעת מי קרא, מתי, ועל איזה מכשיר — נתון שדרוש לרגולציה (BRD §8 — privacy) ולחקירת תקרית במידה שיש.</p>
+      <div class="entity-fields">
+        <div class="f"><span class="type">int</span><span class="name">ack_id</span><span class="key">PK</span></div>
+        <div class="f"><span class="type">int</span><span class="name">message_id</span><span class="key">FK</span></div>
+        <div class="f"><span class="type">int</span><span class="name">driver_id</span><span class="key">FK</span></div>
+        <div class="f"><span class="type">datetime</span><span class="name">read_at</span><span class="key"></span></div>
+        <div class="f"><span class="type">datetime</span><span class="name">acked_at</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">device_type</span><span class="key"></span></div>
+      </div>
+    </div>
+
+    <div class="entity-block">
+      <div class="entity-num">E6</div>
+      <div class="entity-name">LEAVE_REQUEST</div>
+      <div class="entity-tag">בקשת חופשה — תיעוד מלא של מחזור החיים</div>
+      <p>כל בקשה נשמרת מהגשתה ועד החלטה — כולל החלטות שליליות עם נימוק. <code>approver_id</code> מקושר ל-DRIVER (מנהל הוא גם נהג במודל הזה — חוסך טבלת USER נפרדת). <code>decision_note</code> חובה אם <code>status</code> = "נדחתה" — כלל עסקי שמתועד גם ברמת DB ולא רק UI.</p>
+      <div class="entity-fields">
+        <div class="f"><span class="type">int</span><span class="name">leave_id</span><span class="key">PK</span></div>
+        <div class="f"><span class="type">int</span><span class="name">driver_id</span><span class="key">FK</span></div>
+        <div class="f"><span class="type">string</span><span class="name">type</span><span class="key"></span></div>
+        <div class="f"><span class="type">date</span><span class="name">start_date</span><span class="key"></span></div>
+        <div class="f"><span class="type">date</span><span class="name">end_date</span><span class="key"></span></div>
+        <div class="f"><span class="type">string</span><span class="name">status</span><span class="key"></span></div>
+        <div class="f"><span class="type">int</span><span class="name">approver_id</span><span class="key">FK</span></div>
+        <div class="f"><span class="type">string</span><span class="name">decision_note</span><span class="key"></span></div>
+      </div>
+    </div>
+
+    <div class="caveat">
+      <strong>מה לא נכלל ב-ERD הזה במכוון:</strong> טבלאות תפעול של המערכת עצמה (audit log, session, push_token) — אלה שכבת תשתית, לא חלק מהמודל העסקי. הם מתועדים ב-Technical Spec הנפרד, לא ב-BRD.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container narrow">
+    <p>חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026</p>
+    <p style="margin-top: 8px;"><a class="back" href="index.html">← חזרה ל-Case Study</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

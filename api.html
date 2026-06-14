@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>API · מפרט אינטגרציות — Driver Portal</title>
+<meta name="description" content="5 אינטגרציות עם מערכות מקור: scheduling, dispatch, HR, push, IDP — דף הסבר ל-Integration Spec." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FAFAF7; --ink: #14213D; --text: #1F2937; --muted: #6B7280;
+  --rule: #D1D5DB; --rule-dim: #E5E7EB; --accent: #B45309; --card: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', system-ui, sans-serif; background: var(--paper); color: var(--text); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+a { color: var(--ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+.narrow { max-width: 760px; }
+.mast { border-bottom: 1px solid var(--rule-dim); padding: 18px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+.mast-inner { display: flex; justify-content: space-between; align-items: center; }
+.back { color: var(--accent); }
+.back:hover { text-decoration: underline; }
+.hero { padding: 64px 0 40px; border-bottom: 1px solid var(--rule); }
+.eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 500; }
+.h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: clamp(32px, 5vw, 52px); line-height: 1.1; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 20px; }
+.lead { font-family: 'Frank Ruhl Libre', serif; font-size: clamp(18px, 2.2vw, 22px); line-height: 1.55; color: var(--text); max-width: 720px; }
+section { padding: 56px 0; border-bottom: 1px solid var(--rule-dim); }
+.h2 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 28px; color: var(--ink); margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--ink); }
+p { font-size: 16px; line-height: 1.75; color: var(--text); margin-bottom: 14px; }
+p strong { color: var(--ink); font-weight: 600; }
+
+/* Integration card */
+.integration { border-top: 2px solid var(--ink); padding-top: 20px; margin-top: 32px; }
+.integration:first-child { margin-top: 16px; }
+.int-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.12em; margin-bottom: 6px; }
+.int-name { font-family: 'Frank Ruhl Libre', serif; font-size: 26px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.int-sub { color: var(--muted); font-size: 14px; margin-bottom: 18px; font-family: 'JetBrains Mono', monospace; }
+
+.int-grid {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 8px 24px;
+  font-size: 14px;
+  margin-top: 14px;
+}
+.int-grid dt {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule-dim);
+}
+.int-grid dd {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule-dim);
+  color: var(--text);
+  line-height: 1.55;
+}
+.int-grid dd code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  background: #FEF3C7;
+  padding: 1px 6px;
+  border: 1px solid #FCD34D;
+}
+
+.fallback {
+  background: #FEF3C7;
+  border-right: 3px solid var(--accent);
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.fallback strong { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--accent); }
+
+footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="container mast-inner">
+    <span><a class="back" href="index.html">← חזרה ל-Case Study</a></span>
+    <span>04 · API</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="container narrow">
+    <div class="eyebrow">Artifact 04 · Integration Specification</div>
+    <h1 class="h1">חמש אינטגרציות עם מערכות מקור</h1>
+    <p class="lead">
+      ה-Portal לא מחזיק נתונים משלו — הוא חלון לכמה מערכות שכבר קיימות בארגון. לכל אינטגרציה הוגדרו: סוג חיבור, כיוון נתונים, תדירות, ומסלול fallback אם המערכת המקור לא זמינה. (BRD §5)
+    </p>
+  </div>
+</header>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">חמש האינטגרציות, אחת אחת</h2>
+
+    <div class="integration">
+      <div class="int-num">INT-01</div>
+      <div class="int-name">Scheduling System</div>
+      <div class="int-sub">מערכת סידור עבודה — מקור הסידור היומי</div>
+      <p>שולחת ל-Portal את סידור העבודה בכל פעם שיש שינוי. <strong>זה ה-core data flow</strong> שמזין את כל מסכי ה"היום ומחר" של הנהג.</p>
+      <dl class="int-grid">
+        <dt>סוג</dt><dd>REST API (JSON) — push on change</dd>
+        <dt>תדירות</dt><dd>אירועי-דחיפה (בכל שינוי) + sync יומי לבדיקת עקביות</dd>
+        <dt>זרימה</dt><dd>Scheduling → Portal: שיוך נהג למשמרת, שינויים, הוספות, ביטולים</dd>
+        <dt>אימות</dt><dd><code>shift_id</code> ייחודי + checksum על כל ה-payload</dd>
+      </dl>
+      <div class="fallback"><strong>Fallback:</strong> אם ה-API לא זמין — ייבוא ידני של Excel ע"י דיספצ'ר, פעם ביום. נשמרת אותה סכמת רשומות.</div>
+    </div>
+
+    <div class="integration">
+      <div class="int-num">INT-02</div>
+      <div class="int-name">Dispatch Operations</div>
+      <div class="int-sub">מוקד תפעולי — תיאום הסעות (מוניות / רכבי איסוף)</div>
+      <p>שני כיוונים: נהג שולח בקשת איסוף דרך ה-Portal, מוקד מאשר/מקצה רכב, ועדכון סטטוס חוזר ל-Portal עד הגעת הרכב. <strong>ETA למונית בלילה לא יכול לסבול 15 דקות עיכוב</strong> — לכן הארכיטקטורה כאן event-driven מהיסוד.</p>
+      <dl class="int-grid">
+        <dt>סוג</dt><dd><strong>Webhook (ראשי)</strong> + REST polling כ-fallback בלבד</dd>
+        <dt>תדירות</dt><dd>Webhook על כל שינוי סטטוס (real-time). Polling פעם ב-10 דק' רק לאיתור אירועים שאבדו (network blip, downtime).</dd>
+        <dt>זרימה</dt><dd>Portal → Dispatch: בקשה. Dispatch → Portal (webhook): אישור, רכב, ETA, סטטוס חי בכל שינוי.</dd>
+        <dt>אימות</dt><dd>OAuth2 + driver_id משויך לבקשה; webhook חתום עם HMAC לאימות מקור</dd>
+      </dl>
+      <div class="fallback"><strong>Fallback:</strong> אם ה-webhook נופל לאורך זמן (>15 דק' ללא פעימה) — מעבר אוטומטי ל-polling אגרסיבי (פעם בדקה) + פאנל admin ידני במוקד לעדכון סטטוס.</div>
+    </div>
+
+    <div class="integration">
+      <div class="int-num">INT-03</div>
+      <div class="int-name">HR System of Record</div>
+      <div class="int-sub">מערכת משאבי אנוש — SSO + REST</div>
+      <p>מקור-האמת לכל מה שקשור לנהג כעובד: יתרת חופשה, תלושי שכר, חגים, זכאויות. ה-Portal <strong>לא מחזיק עותק</strong> — הוא קורא וכותב בקשות חופשה ישירות לכאן.</p>
+      <dl class="int-grid">
+        <dt>סוג</dt><dd>SSO ל-login + REST API ל-data</dd>
+        <dt>תדירות</dt><dd>on-demand (כל לחיצה של הנהג על "יתרת חופשה")</dd>
+        <dt>זרימה</dt><dd>HR → Portal: יתרה, תלושים. Portal → HR: בקשת חופשה חדשה.</dd>
+        <dt>אימות</dt><dd>SSO token; refresh כל 30 דק'</dd>
+      </dl>
+      <div class="fallback"><strong>Fallback:</strong> ייצוא CSV שבועי לקריאה בלבד; פעולות (הגשת בקשה) מושבתות עד שה-API חוזר.</div>
+    </div>
+
+    <div class="integration">
+      <div class="int-num">INT-04</div>
+      <div class="int-name">FCM / APNs</div>
+      <div class="int-sub">שירותי Push Notifications של Google ו-Apple</div>
+      <p>שליחת התראות לנייד של הנהג: שינוי בסידור, אישור בקשה, הודעה תפעולית קריטית. כל התראה דורשת read-receipt חוזר ל-Portal.</p>
+      <dl class="int-grid">
+        <dt>סוג</dt><dd>Firebase Cloud Messaging (Android) + APNs (iOS)</dd>
+        <dt>תדירות</dt><dd>אירוע (push at event time)</dd>
+        <dt>זרימה</dt><dd>Portal → FCM/APNs → device. read-receipt חוזר דרך ה-App.</dd>
+        <dt>אימות</dt><dd>FCM server key + APNs cert; rotation תקופתית</dd>
+      </dl>
+      <div class="fallback"><strong>Fallback:</strong> הודעה מוצגת ב-In-App Inbox בכניסה הבאה לאפליקציה גם אם ה-push נכשל.</div>
+    </div>
+
+    <div class="integration">
+      <div class="int-num">INT-05</div>
+      <div class="int-name">Organizational IDP</div>
+      <div class="int-sub">ספק הזהויות הארגוני (Active Directory / Azure AD)</div>
+      <p>זיהוי ראשוני של המשתמש לפני שמירת session ב-Portal. <strong>אין סיסמה ייעודית ל-Portal</strong> — משתמשים בזיהוי הארגוני שכבר קיים לכל עובד. זה גם העיקרון שמכתיב את מנגנון ה-Fallback שלמטה.</p>
+      <dl class="int-grid">
+        <dt>סוג</dt><dd>SAML 2.0 או OIDC (תלוי בתשתית הקיימת)</dd>
+        <dt>תדירות</dt><dd>פעם ב-login; refresh לפי policy ארגוני</dd>
+        <dt>זרימה</dt><dd>Browser/App → IDP → Portal session</dd>
+        <dt>אימות</dt><dd>X.509 signing cert; metadata exchange חד-פעמי</dd>
+      </dl>
+      <div class="fallback"><strong>Fallback (מובדל לפי תפקיד — כי IDP למטה לא מאפשר אימות זהות אמיתי):</strong><br/>
+        • <strong>דיספצ'רים ומנהלים</strong> — Emergency Access עם MFA משני (טוקן חומרה / קוד OTP מראש) תחת בקרת מנהל אבטחה. מבטיח נראות תפעולית גם בזמן downtime.<br/>
+        • <strong>נהגים</strong> — לא מקבלים Emergency Access ל-Portal (בניית מערכת ניהול משתמשים מקבילה תסתור את עיקרון "Portal לא מחזיק נתונים"). במקום זה: סידור היומי נשלח אוטומטית כ-SMS, ומוקד תפעולי מקבל את כל הפניות בטלפון עד שה-IDP חוזר.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">טבלת ריכוז — חמש האינטגרציות במבט אחד</h2>
+    <p>סיכום של כל המפרטים שלמעלה. שימושי כדף עזר לדיון Steering Committee, ולתיעוד כניסה לפיתוח.</p>
+
+    <table style="width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px;">
+      <thead>
+        <tr style="background: var(--ink); color: #fff;">
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">מזהה</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">מערכת מקור</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">סוג חיבור</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">כיוון</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">Fallback</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-01</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">Scheduling</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">REST (Push)</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">מערכת ← פורטל</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">העלאת Excel ידנית ע"י דיספצ'ר</td>
+        </tr>
+        <tr style="background: var(--card);">
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-02</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">Dispatch</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">Webhook (ראשי) + REST</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">דו-כיווני</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">Polling אגרסיבי + פאנל ידני במוקד</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-03</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">HR System</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">SSO + REST</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">דו-כיווני</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">קריאה בלבד (CSV), חסימת כתיבה</td>
+        </tr>
+        <tr style="background: var(--card);">
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-04</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">FCM / APNs</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">Push Notification</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">פורטל ← מכשיר</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">In-App Inbox (קריאה בכניסה הבאה)</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-05</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">Org IDP</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">SAML 2.0 / OIDC</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">משתמש ← IDP</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">Emergency Access לניהול (MFA); נהגים — SMS אוטומטי</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="container narrow">
+    <h2 class="h2">למה ה-fallbacks חיו במפרט מהשורה הראשונה</h2>
+    <p>לפני שאישרתי שורה אחת של פונקציונליות, שאלתי על כל אינטגרציה אותה שאלה: <strong>מה קורה כשהצד השני לא זמין?</strong> התשובה לא יכולה להיות "מערכת לא זמינה — נא לפנות לתמיכה". זה מסיט את הסיכון התפעולי לנהג שבדיוק עומד להתחיל משמרת.</p>
+    <p>כל fallback בטבלאות למעלה הוא תוצר של דרישה אופרטיבית אחת: <strong>המערכת חייבת להמשיך לעבוד גם כשאחד הצדדים נופל</strong>. ייבוא Excel ידני, polling במקום webhook, ייצוא CSV שבועי, In-App Inbox במקום push — אלה לא פשרות. הם החלטות שמורידות את הסיכון לאפס בתסריטים שיקרו, לא אם, אלא מתי.</p>
+    <p>זה השוני בין מפרט שאישרתי לחתימה לבין מפרט שלמדתי על קיומו אחרי ה-go-live. את ההפרש הזה הארגון לא רוצה לגלות בשטח.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container narrow">
+    <p>חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026</p>
+    <p style="margin-top: 8px;"><a class="back" href="index.html">← חזרה ל-Case Study</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

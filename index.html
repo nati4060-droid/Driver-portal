@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Driver Portal — Case Study · Nati Yevarkan</title>
+<meta name="description" content="פרויקט אפיון עצמאי לפלטפורמה של ניהול נהגי רכבת — Case Study מאת נתי יברקן" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper:    #FAFAF7;
+    --ink:      #14213D;
+    --text:     #1F2937;
+    --muted:    #6B7280;
+    --rule:     #D1D5DB;
+    --rule-dim: #E5E7EB;
+    --accent:   #B45309;
+    --accent-bg:#FEF3C7;
+    --card-bg:  #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Heebo', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a { color: var(--ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- Layout primitives ---------- */
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 32px; }
+  .col-narrow { max-width: 720px; }
+
+  /* ---------- Mast (top bar) ---------- */
+  .mast {
+    border-bottom: 1px solid var(--rule-dim);
+    padding: 18px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .mast-inner {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .mast-name { color: var(--ink); font-weight: 500; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 80px 0 64px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero-title {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-weight: 900;
+    font-size: clamp(48px, 9vw, 104px);
+    line-height: 0.95;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+    margin-bottom: 32px;
+    direction: ltr;
+    text-align: right;
+  }
+  .hero-subtitle {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.3;
+    color: var(--text);
+    font-weight: 400;
+    max-width: 720px;
+    margin-bottom: 56px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    grid-template-areas: "writeup details";
+    direction: rtl;
+    gap: 56px;
+    align-items: start;
+  }
+  .lede { grid-area: writeup; }
+  .meta {
+    grid-area: details;
+    border-top: 1px solid var(--ink);
+    padding-top: 20px;
+  }
+  .meta-item {
+    display: flex; justify-content: space-between;
+    padding: 10px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    border-bottom: 1px solid var(--rule-dim);
+  }
+  .meta-key { color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .meta-val { color: var(--ink); font-weight: 500; text-align: left; }
+  .meta { text-align: right; }
+
+  .lede {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 22px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .lede strong { font-weight: 700; color: var(--ink); }
+
+  /* ---------- Sections ---------- */
+  section.chapter {
+    padding: 96px 0 64px;
+    border-bottom: 1px solid var(--rule-dim);
+  }
+  .chapter-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .chapter-h {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-weight: 700;
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.15;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--ink);
+    max-width: 880px;
+  }
+  .chapter-body p {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 20px;
+    max-width: 720px;
+  }
+  .chapter-body p strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Pain list (Section 1) ---------- */
+  .pain-list { margin: 32px 0 8px; padding: 0; list-style: none; max-width: 760px; }
+  .pain-list li {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-dim);
+    font-size: 16px;
+    align-items: baseline;
+  }
+  .pain-list li:last-child { border-bottom: none; }
+  .pain-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* ---------- Approach grid (Section 2) ---------- */
+  .approach-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule-dim);
+    border: 1px solid var(--rule-dim);
+    margin-top: 40px;
+  }
+  .approach-cell {
+    background: var(--paper);
+    padding: 28px 24px;
+  }
+  .approach-cell h4 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+  .approach-cell p {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+  .approach-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  /* ---------- Solution / Demo ---------- */
+  .channels {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin: 40px 0 48px;
+  }
+  .channel {
+    border-top: 2px solid var(--ink);
+    padding-top: 20px;
+  }
+  .channel-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+  .channel h4 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 26px;
+    color: var(--ink);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .channel p {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .cta-block {
+    background: var(--ink);
+    color: #fff;
+    padding: 40px 36px;
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  .cta-text {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 22px;
+    line-height: 1.4;
+    color: #fff;
+  }
+  .cta-text small {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #fff;
+    padding: 16px 28px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .cta-btn:hover { background: #92400E; text-decoration: none; color: #fff; }
+  .cta-btn svg { width: 18px; height: 18px; }
+
+  /* ---------- Artifacts list ---------- */
+  .artifacts {
+    list-style: none;
+    padding: 0;
+    margin-top: 32px;
+  }
+  .artifact {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--rule-dim);
+    align-items: center;
+  }
+  .artifact:first-child { border-top: 1px solid var(--ink); }
+  .artifact-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .artifact-body h4 {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .artifact-body p {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0;
+  }
+  .artifact-action {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .artifact-action.disabled { color: var(--muted); }
+
+  /* ---------- Numbers ---------- */
+  .numbers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin: 40px 0 32px;
+  }
+  .number-block {
+    border-top: 1px solid var(--ink);
+    padding-top: 20px;
+  }
+  .number-big {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .number-label {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .caveat {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-right: 2px solid var(--accent);
+    padding-right: 16px;
+    margin-top: 32px;
+    max-width: 720px;
+  }
+
+  /* ---------- About ---------- */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "writeup details";
+    direction: rtl;
+    gap: 64px;
+    margin-top: 32px;
+  }
+  .about-text { grid-area: writeup; }
+  .about-details { grid-area: details; }
+  .about-text p {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .contact-list {
+    list-style: none;
+    border-top: 1px solid var(--ink);
+  }
+  .contact-list li {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule-dim);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .contact-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .contact-val {
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    padding: 48px 0 64px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  footer p { max-width: 720px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 768px) {
+    .container { padding: 0 20px; }
+    .hero { padding: 48px 0 40px; }
+    .hero-title { font-size: 56px; }
+    section.chapter { padding: 64px 0 48px; }
+    .meta-grid { grid-template-columns: 1fr; gap: 32px; }
+    .approach-grid { grid-template-columns: 1fr; }
+    .channels { grid-template-columns: 1fr; gap: 24px; }
+    .cta-block { grid-template-columns: 1fr; padding: 28px 24px; }
+    .cta-btn { justify-content: center; }
+    .numbers { grid-template-columns: 1fr; gap: 28px; }
+    .about-grid { grid-template-columns: 1fr; gap: 32px; }
+    .artifact { grid-template-columns: 60px 1fr; gap: 16px; }
+    .artifact-action { grid-column: 2; padding-top: 4px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ MAST ============ -->
+<div class="mast">
+  <div class="container mast-inner">
+    <span class="mast-name">Nati Yevarkan</span>
+    <span>BRD V2.2 · CASE STUDY · 2026</span>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">A Self-Initiated Business Analyst Project</div>
+    <h1 class="hero-title">Driver Portal</h1>
+    <p class="hero-subtitle">
+      פרויקט אפיון עצמאי לפלטפורמה דיגיטלית של ניהול נהגי רכבת —
+      מסמך דרישות מלא, מודל נתונים, ופרוטוטייפ עובד.
+    </p>
+
+    <div class="meta-grid">
+      <div class="meta">
+        <div class="meta-item"><span class="meta-key">מחבר</span><span class="meta-val">נתי יברקן</span></div>
+        <div class="meta-item"><span class="meta-key">תפקיד</span><span class="meta-val">BA · יוזמה עצמאית</span></div>
+        <div class="meta-item"><span class="meta-key">גרסה</span><span class="meta-val">2.2 — סופי</span></div>
+        <div class="meta-item"><span class="meta-key">תאריך</span><span class="meta-val">מאי 2026</span></div>
+        <div class="meta-item"><span class="meta-key">תחום</span><span class="meta-val">תפעול רכבות</span></div>
+      </div>
+      <p class="lede">
+        אחרי <strong>11 שנים בקבינה</strong> ראיתי כל יום איך תהליכים מבוזרים שורפים זמן וכסף — מאות נהגים, ארבעה ערוצי תקשורת שונים, ואפס מקור אמת.
+        במקום להתלונן, אפיינתי תהליך מקצה לקצה, בניתי מסמך דרישות מלא, ואז בניתי פרוטוטייפ עובד שמדגים את הזרימות העיקריות.
+        זה ה-Case Study של מה שיצא.
+      </p>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 01 — THE PROBLEM ============ -->
+<section class="chapter">
+  <div class="container col-narrow">
+    <div class="chapter-label">01 · The Problem</div>
+    <h2 class="chapter-h">מאות נהגים. ארבעה ערוצי תקשורת. אפס מקור אמת.</h2>
+    <div class="chapter-body">
+      <p>
+        בארגון תפעולי בקנה מידה לאומי שמפעיל מאות נהגי רכבת, סידור העבודה היומי מתפזר על פני <strong>אימייל, לוחות מודעות מודפסים, קבוצות וואטסאפ ושיחות טלפון</strong>. שינויים ברגע האחרון מועברים בעל-פה. לוחות הזמנים מתחלפים בלי תיעוד אישור קבלה. אין אמצעי למנהל לדעת שהמסר הועבר.
+      </p>
+      <p>
+        במקביל, תיאום מוניות לתחילת או סוף משמרת נעשה ידנית, דרך עשרות שיחות יומיות בין נהגים ומוקד. אין רישום, אין מעקב, וכשמשהו מתפספס — אין למי לחזור. שיחות חוזרות לוקחות זמן יקר מצוות מוקד תפעולי שצריך להיות פנוי לדברים חשובים יותר.
+      </p>
+
+      <ul class="pain-list">
+        <li><span class="pain-num">01</span><span>נהגים מבזבזים 8–12 דקות ביום בבדיקה רוחבית של ערוצים שונים</span></li>
+        <li><span class="pain-num">02</span><span>מוקד תפעולי שורף ~60 שיחות ביום על תיאום מוניות שאפשר לאוטמט</span></li>
+        <li><span class="pain-num">03</span><span>אין mechanism של read-receipt — מנהל לא יודע אם המסר הועבר</span></li>
+        <li><span class="pain-num">04</span><span>בקשות חופשה דרך מערכת HR נפרדת, ללא ראות סטטוס באפליקציה</span></li>
+        <li><span class="pain-num">05</span><span>פניות נהגים מתערבבות בקבוצות וואטסאפ — מסרים קריטיים נבלעים ברעש</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 — APPROACH ============ -->
+<section class="chapter">
+  <div class="container col-narrow">
+    <div class="chapter-label">02 · Approach</div>
+    <h2 class="chapter-h">כך אני עובד. וזה המוצר.</h2>
+    <div class="chapter-body">
+      <p>
+        אפיון אינו מסמך, הוא <strong>חוזה</strong> — בין הצורך העסקי לבין צוות הפיתוח, ובין ההווה לבין מצב שטרם נכתב. ניהלתי את החוזה הזה עד הסוף: הגדרתי את הבעיה לפני הפתרון, הקפאתי את הסקופ ברגע שאישרתי אותו, ותרגמתי כל דרישה תפעולית לשפה שצוות הפיתוח לא יצטרך לפרש מחדש. <strong>כל דו-משמעות במסמך הזה היא בלגן בייצור — לכן אין בו דו-משמעות.</strong>
+      </p>
+      <p>
+        המתודולוגיה מתחת לפני השטח עומדת בתקני BA מקובלים: זיהוי בעיה, ניתוח Gap, FRs/NFRs, User Stories עם acceptance criteria, מודל נתונים, מפרט אינטגרציות עם fallbacks, ROI מודולרי, ו-Risk Register. אבל המתודולוגיה היא הכלי, לא הסיפור — <strong>הסיפור הוא שבסוף התהליך הזה יש מסמך שיכול לעלות לשולחן ועדת היגוי, לקבל אישור, ולהיכנס לפיתוח בלי סבב הבהרות נוסף</strong>.
+      </p>
+
+      <div class="approach-grid">
+        <div class="approach-cell">
+          <div class="approach-num">STEP 01</div>
+          <h4>Discovery</h4>
+          <p>זיהוי כאב מהשטח, מיפוי בעלי עניין (נהגים, מוקד, סידור עבודה, מנהלי יחידה), וניתוח התהליכים הקיימים — As-Is.</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">STEP 02</div>
+          <h4>Requirements</h4>
+          <p>BRD מלא עם 15 סעיפים: דרישות פונקציונליות לפי מודולים, NFR לביצועים ופרטיות, User Stories עם קריטריוני קבלה.</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">STEP 03</div>
+          <h4>Modeling</h4>
+          <p>ERD לוגי עם 6 ישויות מרכזיות; To-Be flow לתהליכים העיקריים; מפרט אינטגרציות מול 5 מערכות חיצוניות.</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">STEP 04</div>
+          <h4>Business Case</h4>
+          <p>מודל ROI מודולרי, Risk Register, מפת דרכים פאזות 1–4 עם Success Gates מוגדרים בין שלבים.</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">STEP 05</div>
+          <h4>Prototype</h4>
+          <p>פרוטוטייפ עובד ב-React — 5 מסכים, זרימת אישור מנהל, חוקי ולידציה לפי ה-BRD. לא ציורים, אפליקציה.</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">STEP 06</div>
+          <h4>Scope Management</h4>
+          <p>Phase 2 (צ'אט נהלים בטאבלט הקבינה) מתועד אבל לא מתערבב עם V2.2 — הקפאת סקופ היא חלק מהעבודה.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 — SOLUTION + CTA ============ -->
+<section class="chapter">
+  <div class="container col-narrow">
+    <div class="chapter-label">03 · Solution</div>
+    <h2 class="chapter-h">פלטפורמה רב-ערוצית, אחת לכל רגע במשמרת.</h2>
+    <div class="chapter-body">
+      <p>
+        החלטה ראשונה בעיצוב היתה לא להניח שהפתרון הוא "אפליקציה". נוהל פנימי אוסר על נהג להחזיק פלאפון בקבינה. אז פיצ'רים שצריך לבדוק לפני המשמרת — סידור, חופשות, היסטוריה — חיים בפלאפון. ופיצ'רים תפעוליים בזמן הנסיעה — חיפוש נהלים, התראות — חיים בטאבלט הקבינה. <strong>כל ערוץ מותאם לרגע, למיקום, ולמגבלות הרגולטוריות שלו</strong>.
+      </p>
+
+      <div class="channels">
+        <div class="channel">
+          <div class="channel-eyebrow">Channel 01</div>
+          <h4>פלאפון אישי</h4>
+          <p>סידור עבודה, בקשת חופשה, היסטוריית משמרות, מעקב בקשות. שימוש לפני ואחרי משמרת.</p>
+        </div>
+        <div class="channel">
+          <div class="channel-eyebrow">Channel 02</div>
+          <h4>טאבלט קבינה</h4>
+          <p>צ'אט נהלים (Phase 2), התראות תפעוליות, סטטוס משמרת פעילה. שימוש בזמן הנסיעה.</p>
+        </div>
+      </div>
+
+      <div class="cta-block">
+        <div class="cta-text">
+          הפרוטוטייפ עובד. תכנס, לחץ, נסה את הזרימות.
+          <small>5 מסכים · אישור מנהל · ולידציה לפי BRD</small>
+        </div>
+        <a class="cta-btn" href="app.html" target="_blank" rel="noopener">
+          נסה את הדמו
+          <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path d="M3 10h12M11 6l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 — ARTIFACTS ============ -->
+<section class="chapter">
+  <div class="container col-narrow">
+    <div class="chapter-label">04 · Artifacts</div>
+    <h2 class="chapter-h">מה שיש לקרוא.</h2>
+    <div class="chapter-body">
+      <p>זה לא Case Study של "הצגות יפות". כל פריט ברשימה הוא דליברבל אמיתי — נכתב, נסקר, ועומד בפני עצמו.</p>
+
+      <ul class="artifacts">
+        <li class="artifact">
+          <span class="artifact-id">01 · DOC</span>
+          <div class="artifact-body">
+            <h4>BRD V2.2 — מסמך דרישות מלא</h4>
+            <p>15 סעיפים, 25 עמודים: Executive Summary, Gap Analysis, Functional + Non-Functional Requirements, User Stories, ERD, Integration Specs, ROI Model, Risk Register, Phased Roadmap.</p>
+          </div>
+          <a class="artifact-action" href="Driver_Portal_BRD.pdf" target="_blank" rel="noopener">PDF · הורד ←</a>
+        </li>
+        <li class="artifact">
+          <span class="artifact-id">02 · APP</span>
+          <div class="artifact-body">
+            <h4>Prototype — פלאפון נהג + טאבלט קבינה</h4>
+            <p>5 מסכים, 2 פרסונות (נהג + מנהל), זרימת אישור מקצה-לקצה, ולידציות לפי כללי ה-BRD, צ'אט נהלים בטאבלט.</p>
+          </div>
+          <a class="artifact-action" href="app.html" target="_blank" rel="noopener">App · נסה ←</a>
+        </li>
+        <li class="artifact">
+          <span class="artifact-id">03 · DATA</span>
+          <div class="artifact-body">
+            <h4>ERD — מודל נתונים לוגי</h4>
+            <p>6 ישויות מרכזיות: Driver, Shift, TaxiRequest, Message, AcknowledgmentLog, LeaveRequest — עם קשרים, מפתחות, ושיקולי normalization. (בתוך ה-BRD, סעיף 10)</p>
+          </div>
+          <a class="artifact-action" href="data.html">צפה ←</a>
+        </li>
+        <li class="artifact">
+          <span class="artifact-id">04 · API</span>
+          <div class="artifact-body">
+            <h4>Integration Spec</h4>
+            <p>5 אינטגרציות: Scheduling System, Dispatch Operations, HR System of Record (SSO + REST), FCM/APNs, Organizational IDP. (BRD §5)</p>
+          </div>
+          <a class="artifact-action" href="api.html">צפה ←</a>
+        </li>
+        <li class="artifact">
+          <span class="artifact-id">05 · ROI</span>
+          <div class="artifact-body">
+            <h4>Business Case — מודל החזר</h4>
+            <p>מודל מודולרי לחיסכון משוער של ~₪84,000/שנה דרך אוטומציה של תיאומי מוניות + ~5,000 שעות נהג שנתיות. הנחות מתועדות, נדרש validation בייצור. (BRD §9)</p>
+          </div>
+          <a class="artifact-action" href="roi.html">צפה ←</a>
+        </li>
+        <li class="artifact">
+          <span class="artifact-id">06 · FLOW</span>
+          <div class="artifact-body">
+            <h4>Process Flows — As-Is / To-Be</h4>
+            <p>2 תהליכי ליבה — שינוי סידור עבודה ותיאום מונית — ממופים בשני המצבים. תיעוד הפער הוא הוכחת הערך. (BRD §7)</p>
+          </div>
+          <a class="artifact-action" href="flow.html">צפה ←</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 05 — NUMBERS ============ -->
+<section class="chapter">
+  <div class="container col-narrow">
+    <div class="chapter-label">05 · Execution &amp; Impact</div>
+    <h2 class="chapter-h">המספרים — מה שעשיתי בפועל, ומה שהמודל מציע.</h2>
+    <div class="chapter-body">
+      <p>שני סוגי מספרים, ביושר: הראשונים — מה שיצא מה-pipeline שבניתי בפועל. השניים — מודל ROI מתודולוגי שמראה איך אנליסט עסקי בונה business case מהנחות מתועדות.</p>
+
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.16em; text-transform: uppercase; margin-top: 32px; margin-bottom: 16px; font-weight: 500;">From the running pipeline</div>
+      <div class="numbers">
+        <div class="number-block">
+          <div class="number-big">177</div>
+          <div class="number-label">נהגים שעובדו<br/>מסידור עבודה אחד (PDF)</div>
+        </div>
+        <div class="number-block">
+          <div class="number-big">1,461</div>
+          <div class="number-label">משימות מנורמלות<br/>(task_sequence) במודל הנתונים</div>
+        </div>
+        <div class="number-block">
+          <div class="number-big">3</div>
+          <div class="number-label">סבבי תיקון<br/>כל אחד מולד מבאג ייצור אמיתי</div>
+        </div>
+      </div>
+      <p style="font-size: 14px; color: var(--muted); margin-top: 16px; margin-bottom: 32px;">Pipeline: Gmail IMAP ← pdfplumber + python-bidi (תיקון RTL עברית) ← נורמליזציה ל-3 טבלאות ← אחסון. כל הנתונים מעובדים אצלי, לא ב-cloud פומבי.</p>
+
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.16em; text-transform: uppercase; margin-top: 48px; margin-bottom: 16px; font-weight: 500;">Modeled ROI (BRD §9)</div>
+      <div class="numbers">
+        <div class="number-block">
+          <div class="number-big">~₪84K</div>
+          <div class="number-label">חיסכון שנתי משוער<br/>בשעות מוקד תפעולי</div>
+        </div>
+        <div class="number-block">
+          <div class="number-big">~800h</div>
+          <div class="number-label">שעות מוקד תפעולי<br/>שנחסכות מאוטומציה</div>
+        </div>
+        <div class="number-block">
+          <div class="number-big">~5,000h</div>
+          <div class="number-label">סך זמן נהגים שנחסך<br/>על פני מאות עובדים</div>
+        </div>
+      </div>
+
+      <div class="caveat">
+        <strong>אבחנה חשובה:</strong> המספרים הראשונים הם <strong>תוצרים ממומשים</strong> — pipeline פועל על נתונים אמיתיים. המספרים השניים הם <strong>מודל מתודולוגי</strong> — הנחות מתועדות, לא נגזרים מנתוני תפעול של ארגון ספציפי. ההפרדה הזאת היא בדיוק מה שאנליסט עושה: מראה מה נמדד, מה משוער, ומגדיר את ההבדל.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 06 — BUILD LOG ============ -->
+<section class="chapter">
+  <div class="container col-narrow">
+    <div class="chapter-label">06 · Build Log</div>
+    <h2 class="chapter-h">איך זה נבנה, בשלושה מהלכים.</h2>
+    <div class="chapter-body">
+      <p>אנליסט טוב לא רק כותב BRD — הוא מבין איך המציאות מחזירה למפרט. בניתי pipeline אמיתי, ראיתי איפה ה-PDF הראשון שבר את ההנחות, ותיקנתי. שלושת ה-commits למטה הם <strong>נרטיב</strong> של החשיבה האנליטית, לא רק לוג קוד.</p>
+
+      <div class="approach-grid">
+        <div class="approach-cell">
+          <div class="approach-num">COMMIT 01</div>
+          <h4>Pipeline ראשוני</h4>
+          <p>Gmail IMAP ← הורדת PDF ← parsing עם pdfplumber ← תיקון RTL עברית ← שמירה ל-Firestore. הגרסה הראשונה של "זה אמור לעבוד".</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">COMMIT 02</div>
+          <h4>המציאות החזירה</h4>
+          <p>PDFs של סידור הם רב-עמודיים, השם מופיע ב-col[7] לפעמים ולא ב-col[8], ויש רכבות עם 2 ספרות שלא היו במפרט. שינוי המודל לפי מה שהנתונים האמיתיים מראים — לא לפי מה שהנחתי.</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">COMMIT 03</div>
+          <h4>עידון לוגיקה עסקית</h4>
+          <p>בדק → הרכבת שאחרי "בדק". תחנת סיום ריקה → ברירת מחדל "לוד". חילוץ הערות מהתחתית. שלוש הבחנות מתוך הדומיין — תוצאה של עבודה עם הנתונים, לא של מפרט תאורטי.</p>
+        </div>
+        <div class="approach-cell">
+          <div class="approach-num">RESULT</div>
+          <h4>Parser Output — נהג אחד</h4>
+          <p style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7; color: var(--text); direction: ltr; text-align: left; background: var(--card-bg); padding: 12px; border: 1px solid var(--rule-dim); margin-top: 8px;">
+{<br/>
+&nbsp;&nbsp;"shift_type": "בוקר",<br/>
+&nbsp;&nbsp;"start_time": "05:40",<br/>
+&nbsp;&nbsp;"end_time": "13:10",<br/>
+&nbsp;&nbsp;"stationStart": "לוד",<br/>
+&nbsp;&nbsp;"stationEnd": "באר שבע",<br/>
+&nbsp;&nbsp;"task_sequence": [<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;"בדק 4112",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;"4112", "באר שבע",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;"4117", "לוד",<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;"4124", "באר שבע"<br/>
+&nbsp;&nbsp;],<br/>
+&nbsp;&nbsp;"trains": ["4112","4117","4124"],<br/>
+&nbsp;&nbsp;"hasBdek": true,<br/>
+&nbsp;&nbsp;"bdekTrain": "4112",<br/>
+&nbsp;&nbsp;"notes": "החלפת נהג בלוד"<br/>
+}
+          </p>
+        </div>
+      </div>
+
+      <p style="margin-top: 32px;"><strong>השיעור האנליטי:</strong> אם הייתי כותב את ה-BRD בלי לבנות את ה-pipeline — לא הייתי יודע שצריך שדה <code>bdekTrain</code> נפרד מ-<code>hasBdek</code>. הקוד לימד אותי איפה המפרט שלי לא היה מספיק מדויק.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 — ABOUT ============ -->
+<section class="chapter">
+  <div class="container col-narrow">
+    <div class="chapter-label">07 · Author</div>
+    <h2 class="chapter-h">נתי יברקן.</h2>
+    <div class="chapter-body">
+      <div class="about-grid">
+        <div class="about-text">
+          <p>
+            11+ שנים נהג רכבת נוסעים בארגון תפעולי בקנה מידה לאומי. סטודנט שנה ג' לתואר ראשון במנהל עסקים עם התמחות במערכות מידע (ממוצע 90), ובוגר קורס Data Analyst (ציון 95).
+          </p>
+          <p>
+            במעבר ל-<strong>Business Analyst / Systems Analyst</strong> — תפקיד שמחבר בין השטח שאני מכיר לטכנולוגיה שאני לומד. הפרויקט הזה הוא ההוכחה.
+          </p>
+        </div>
+        <div class="about-details">
+          <ul class="contact-list">
+            <li>
+              <span class="contact-key">LinkedIn</span>
+              <a class="contact-val" href="#" target="_blank" rel="noopener">linkedin.com/in/nati-yevarkan</a>
+            </li>
+            <li>
+              <span class="contact-key">CV</span>
+              <a class="contact-val" href="CV.pdf" target="_blank" rel="noopener">קו"ח · PDF</a>
+            </li>
+            <li>
+              <span class="contact-key">Email</span>
+              <a class="contact-val" href="mailto:nati.yevarkan@example.com">צור קשר</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <p>
+      Self-initiated portfolio artifact. Not affiliated with, endorsed by, or commissioned by any organization. All figures, system names, and operational details are illustrative estimates by the author for the purpose of demonstrating Business Analyst capability — they are not derived from any specific organization's confidential data.
+    </p>
+    <p style="margin-top: 16px;">© 2026 · Nati Yevarkan</p>
+  </div>
+</footer>
+
+</body>
+</html>
