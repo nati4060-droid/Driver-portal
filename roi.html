@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ROI · Business Case — Driver Portal</title>
-<meta name="description" content="מודל החזר השקעה משוער — חיסכון של ~₪84K בשנה, ~5,000 שעות נהג. הנחות מתועדות." />
+<meta name="description" content="Estimated ROI model — ~₪84K annual savings, ~5,000 driver-hours. Documented assumptions." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -21,8 +21,23 @@ a:hover { text-decoration: underline; }
 .narrow { max-width: 760px; }
 .mast { border-bottom: 1px solid var(--rule-dim); padding: 18px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
 .mast-inner { display: flex; justify-content: space-between; align-items: center; }
+.mast-actions { display: flex; align-items: center; gap: 14px; }
 .back { color: var(--accent); }
 .back:hover { text-decoration: underline; }
+.lang-toggle {
+  background: rgba(20, 33, 61, 0.06);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.lang-toggle:hover { background: var(--ink); color: #fff; transform: translateY(-1px); }
 .hero { padding: 64px 0 40px; border-bottom: 1px solid var(--rule); }
 .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 500; }
 .h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: clamp(32px, 5vw, 52px); line-height: 1.1; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 20px; }
@@ -49,6 +64,11 @@ tr.total td { font-weight: 700; background: #FEF3C7; border-top: 2px solid var(-
 
 .caveat { background: #FEF3C7; border-right: 3px solid var(--accent); padding: 16px 20px; font-size: 14px; line-height: 1.7; margin-top: 24px; }
 
+/* Direction-aware overrides for LTR */
+[dir="ltr"] th, [dir="ltr"] td { text-align: left; }
+[dir="ltr"] td.num { text-align: right; }
+[dir="ltr"] .caveat { border-right: none; border-left: 3px solid var(--accent); }
+
 footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
 </style>
 </head>
@@ -56,60 +76,63 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
 
 <div class="mast">
   <div class="container mast-inner">
-    <span><a class="back" href="index.html">← חזרה ל-Case Study</a></span>
-    <span>05 · ROI</span>
+    <span><a class="back" href="index.html" data-i18n="backLink">← Back to Case Study</a></span>
+    <div class="mast-actions">
+      <button class="lang-toggle" id="langToggle" aria-label="Switch language">HE</button>
+      <span data-i18n="pageId">ROI</span>
+    </div>
   </div>
 </div>
 
 <header class="hero">
   <div class="container narrow">
-    <div class="eyebrow">Artifact 05 · Business Case</div>
-    <h1 class="h1">מודל ROI — חיסכון משוער, הנחות מתועדות</h1>
-    <p class="lead">
-      זה לא תחזית. זה מודל מתודולוגי שמראה איך אנליסט מתרגם שיפור תהליכי לכסף — שעת עבודה אחר שעת עבודה, עם הנחות שכל אחד יכול לאתגר. (BRD §9)
+    <div class="eyebrow" data-i18n="eyebrow">Business Case</div>
+    <h1 class="h1" data-i18n="heroH1">ROI model. Estimated savings, documented assumptions.</h1>
+    <p class="lead" data-i18n="heroLead">
+      A modular model that translates process improvement into annual financial savings. Every assumption is documented and open to challenge. The final figures derive directly from the parameters below, and can't be interpreted without challenging at least one of them. (BRD Section 9)
     </p>
   </div>
 </header>
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">השורה התחתונה</h2>
+    <h2 class="h2" data-i18n="s1Title">The bottom line.</h2>
 
     <div class="numbers">
       <div class="number-block">
         <div class="number-big">~₪84K</div>
-        <div class="number-label">חיסכון שנתי משוער<br/>בשעות מוקד תפעולי</div>
+        <div class="number-label" data-i18n-html="num1">Estimated annual savings<br/>in ops center hours</div>
       </div>
       <div class="number-block">
         <div class="number-big">~800h</div>
-        <div class="number-label">שעות מוקד שנחסכות<br/>מאוטומציה של תיאומים</div>
+        <div class="number-label" data-i18n-html="num2">Ops hours saved<br/>by coordination automation</div>
       </div>
       <div class="number-block">
         <div class="number-big">~5,000h</div>
-        <div class="number-label">סך זמן נהגים שנחסך<br/>על פני מאות עובדים</div>
+        <div class="number-label" data-i18n-html="num3">Total driver time saved<br/>across hundreds of employees</div>
       </div>
     </div>
 
-    <div class="caveat">
-      <strong>קודם כל — מה זה לא:</strong> אלה לא מספרים שנגזרו מנתוני תפעול של ארגון ספציפי. אלה הערכות מודולריות שנבנו על בסיס הנחות שמתועדות למטה. <strong>מה זה כן:</strong> תרגיל אנליטי שמראה איך לבנות business case מבוסס היגיון — מיומנות ליבה של אנליסט עסקי.
+    <div class="caveat" data-i18n-html="s1Caveat">
+      <strong>Context:</strong> These numbers don't derive from any specific organization's operational data. They are modular estimates built on documented assumptions. The model is a framework for a business case that can be challenged and refined, not a forecast.
     </div>
   </div>
 </section>
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">מודול 1 — חיסכון בשעות מוקד תפעולי</h2>
-    <p>המוקד התפעולי שורף שיחות יומיות על תיאומי מוניות. כל שיחה ~3 דקות ממוצע, וקיימת תוספת על הסחת דעת בין שיחות. ה-Portal מאוטמט את הזרימה — נהג מבקש, רכב נקצה, מוקד מאשר רק חריגים.</p>
+    <h2 class="h2" data-i18n="s2Title">Module 1 — Savings in ops center hours</h2>
+    <p data-i18n="s2P">The ops center burns through daily calls coordinating taxis. Each call averages ~3 minutes, with added context-switch overhead between calls. The Portal automates the flow: driver requests, vehicle gets assigned, ops only approves exceptions.</p>
 
     <table>
-      <thead><tr><th>פרמטר</th><th>ערך</th><th>הנחה</th></tr></thead>
+      <thead><tr><th data-i18n="tblParam">Parameter</th><th data-i18n="tblValue">Value</th><th data-i18n="tblAssumption">Assumption</th></tr></thead>
       <tbody>
-        <tr><td>שיחות תיאום מונית ביום</td><td class="num">~60</td><td>מבוסס על אומדן תפעולי, נדרש אימות</td></tr>
-        <tr><td>זמן ממוצע לשיחה (כולל context-switch)</td><td class="num">~3.5 דק'</td><td>2 דק' שיחה + 1.5 דק' רישום ומעקב</td></tr>
-        <tr><td>אחוז שניתן לאוטמט מלא</td><td class="num">~70%</td><td>שאר 30% חריגים שדורשים אדם</td></tr>
-        <tr><td>ימי עבודה בשנה</td><td class="num">250</td><td>נכון ל-shift תפעולי</td></tr>
-        <tr><td>עלות שעת עובד מוקד (העמסה מלאה)</td><td class="num">~₪105</td><td>שכר + מסים + תקורה, ברוטו ל-מעביד</td></tr>
-        <tr class="total"><td>חיסכון שנתי משוער</td><td class="num">~₪83,895</td><td>= 60 × 3.5 × 0.7 × 250 × ₪105 ÷ 60</td></tr>
+        <tr><td data-i18n="m1r1l">Daily taxi-coordination calls</td><td class="num">~60</td><td data-i18n="m1r1r">Based on operational estimate, requires validation</td></tr>
+        <tr><td data-i18n="m1r2l">Avg. time per call (incl. context-switch)</td><td class="num" data-i18n="m1r2v">~3.5 min</td><td data-i18n="m1r2r">2 min call + 1.5 min logging and follow-up</td></tr>
+        <tr><td data-i18n="m1r3l">Share that can be fully automated</td><td class="num">~70%</td><td data-i18n="m1r3r">Remaining 30% are exceptions requiring a human</td></tr>
+        <tr><td data-i18n="m1r4l">Working days per year</td><td class="num">250</td><td data-i18n="m1r4r">Standard operational shift schedule</td></tr>
+        <tr><td data-i18n="m1r5l">Fully-loaded ops agent hourly cost</td><td class="num">~₪105</td><td data-i18n="m1r5r">Salary + taxes + overhead, gross to employer</td></tr>
+        <tr class="total"><td data-i18n="m1r6l">Estimated annual savings</td><td class="num">~₪83,895</td><td data-i18n="m1r6r">= 60 × 3.5 × 0.7 × 250 × ₪105 ÷ 60</td></tr>
       </tbody>
     </table>
   </div>
@@ -117,44 +140,206 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">מודול 2 — חיסכון בזמן נהגים</h2>
-    <p>נהג שעובר על 4 ערוצי תקשורת בכל בוקר (אימייל, וואטסאפ, SMS, נייר) מבזבז זמן שלא מתחלף לערך. ה-Portal מרכז הכל למסך אחד.</p>
+    <h2 class="h2" data-i18n="s3Title">Module 2 — Savings in driver time</h2>
+    <p data-i18n="s3P">A driver checking 4 communication channels every morning (email, WhatsApp, SMS, paper) loses time that doesn't translate to value. The Portal consolidates everything onto a single screen.</p>
 
     <table>
-      <thead><tr><th>פרמטר</th><th>ערך</th><th>הנחה</th></tr></thead>
+      <thead><tr><th data-i18n="tblParam2">Parameter</th><th data-i18n="tblValue2">Value</th><th data-i18n="tblAssumption2">Assumption</th></tr></thead>
       <tbody>
-        <tr><td>נהגים פעילים</td><td class="num">~400</td><td>סדר גודל לארגון תפעולי בקנה מידה לאומי</td></tr>
-        <tr><td>זמן יומי על בדיקת ערוצים</td><td class="num">~8-12 דק'</td><td>שמרני; ימי שינוי הם גבוהים יותר</td></tr>
-        <tr><td>זמן שנחסך בערוץ מאוחד</td><td class="num">~75%</td><td>15% נשארים — בדיקה ראשונית ואישור קבלה</td></tr>
-        <tr><td>ימי עבודה ממוצע לנהג בשנה</td><td class="num">~220</td><td>בניכוי חופשות, חגים, סופ"ש</td></tr>
-        <tr class="total"><td>סך זמן נחסך לכל הנהגים</td><td class="num">~4,950 שעות</td><td>= 400 × 10 × 0.75 × 220 ÷ 60</td></tr>
+        <tr><td data-i18n="m2r1l">Active drivers</td><td class="num">~400</td><td data-i18n="m2r1r">Order of magnitude for a national-scale operation</td></tr>
+        <tr><td data-i18n="m2r2l">Daily time spent checking channels</td><td class="num" data-i18n="m2r2v">~8-12 min</td><td data-i18n="m2r2r">Conservative; schedule-change days are higher</td></tr>
+        <tr><td data-i18n="m2r3l">Time saved with a unified channel</td><td class="num">~75%</td><td data-i18n="m2r3r">15% remain — initial scan and read-receipt</td></tr>
+        <tr><td data-i18n="m2r4l">Avg. working days per driver per year</td><td class="num">~220</td><td data-i18n="m2r4r">After vacation, holidays, weekends</td></tr>
+        <tr class="total"><td data-i18n="m2r5l">Total time saved across all drivers</td><td class="num" data-i18n="m2r5v">~4,950 hours</td><td data-i18n="m2r5r">= 400 × 10 × 0.75 × 220 ÷ 60</td></tr>
       </tbody>
     </table>
 
-    <p style="margin-top: 18px;"><strong>שווי זמן הנהגים:</strong> לא הוכנס לחישוב ה-₪. נהגים מקבלים שעה לחודש, לא לפי פרודוקטיביות. אבל הזמן הזה <strong>הולך לאיכות החיים שלהם</strong> — וזה ערך אמיתי שלא חייב להיות בש"ח כדי להיות שווה לאמירה.</p>
+    <p style="margin-top: 18px;" data-i18n-html="s3FollowUp"><strong>Value of driver time:</strong> Not included in the ₪ calculation. Drivers are paid per hour, not by productivity. But that time <strong>goes back into their quality of life</strong> — a real value that doesn't need a shekel sign to be worth stating.</p>
   </div>
 </section>
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">מה לא נכלל במודל</h2>
-    <h3 class="h3">צד עלות</h3>
-    <p>פיתוח, רישוי, תשתית cloud, אחזקה שוטפת, training — לא חושבו. מטרת המודל היא להעריך את ה-<strong>upside</strong>, לא ROI נטו. עלות הפרויקט תושווה רק כשתהיה הצעת מחיר ממשית.</p>
-    <h3 class="h3">צד הכנסה</h3>
-    <p>שיפור פנימי לא מייצר הכנסה ישירה. אבל הפחתת שגיאות תפעוליות (מפספסי משמרת, איחורים) שווה כסף — לא נכנסה למודל כי הקושי לכמת אותה גבוה מדי לפורמט הזה.</p>
+    <h2 class="h2" data-i18n="s4Title">What the model excludes</h2>
+    <h3 class="h3" data-i18n="s4H3a">Cost side</h3>
+    <p data-i18n-html="s4Pa">Development, licensing, cloud infrastructure, ongoing maintenance, training — not computed. The model is meant to estimate the <strong>upside</strong>, not net ROI. Project cost will be compared only when there is a real quote.</p>
+    <h3 class="h3" data-i18n="s4H3b">Revenue side</h3>
+    <p data-i18n="s4Pb">Internal improvement doesn't generate direct revenue. Reducing operational errors (missed shifts, lateness) is worth money, but wasn't included because quantifying it accurately exceeds the scope of this format.</p>
 
-    <div class="caveat">
-      <strong>איך אנליסט קורא את המודל הזה:</strong> "טעות פוטנציאלית גדולה ב-20% עדיין משאירה ROI חיובי משמעותי." זה לא תחזית מדויקת — זה <strong>תרגיל סבירות</strong>. ההפרדה בין מה שמדיד למה שמשוער היא חלק קריטי מתפקיד האנליסט.
+    <div class="caveat" data-i18n-html="s4Caveat">
+      <strong>How to read these numbers:</strong> Even in a conservative scenario that cuts assumptions by 20%, ROI stays meaningfully positive. This isn't a precise forecast — it's a <strong>sanity check</strong>, a framework for a decision, not a guarantee of outcome. Validation against real operational data is required before go-live.
     </div>
   </div>
 </section>
 
 <footer>
   <div class="container narrow">
-    <p>חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026</p>
-    <p style="margin-top: 8px;"><a class="back" href="index.html">← חזרה ל-Case Study</a></p>
+    <p data-i18n="footerP">Part of Nati Yevarkan's portfolio. Self-initiated analysis, not commissioned by any organization. © 2026</p>
+    <p style="margin-top: 8px;"><a class="back" href="index.html" data-i18n="backLink2">← Back to Case Study</a></p>
   </div>
 </footer>
+
+<script>
+  const translations = {
+    en: {
+      backLink: '← Back to Case Study',
+      backLink2: '← Back to Case Study',
+      pageId: 'ROI',
+      eyebrow: 'Business Case',
+      heroH1: 'ROI model. Estimated savings, documented assumptions.',
+      heroLead: "A modular model that translates process improvement into annual financial savings. Every assumption is documented and open to challenge. The final figures derive directly from the parameters below, and can't be interpreted without challenging at least one of them. (BRD Section 9)",
+      s1Title: 'The bottom line.',
+      num1: 'Estimated annual savings<br/>in ops center hours',
+      num2: 'Ops hours saved<br/>by coordination automation',
+      num3: 'Total driver time saved<br/>across hundreds of employees',
+      s1Caveat: "<strong>Context:</strong> These numbers don't derive from any specific organization's operational data. They are modular estimates built on documented assumptions. The model is a framework for a business case that can be challenged and refined, not a forecast.",
+      s2Title: 'Module 1 — Savings in ops center hours',
+      s2P: 'The ops center burns through daily calls coordinating taxis. Each call averages ~3 minutes, with added context-switch overhead between calls. The Portal automates the flow: driver requests, vehicle gets assigned, ops only approves exceptions.',
+      tblParam: 'Parameter', tblValue: 'Value', tblAssumption: 'Assumption',
+      tblParam2: 'Parameter', tblValue2: 'Value', tblAssumption2: 'Assumption',
+      m1r1l: 'Daily taxi-coordination calls',
+      m1r1r: 'Based on operational estimate, requires validation',
+      m1r2l: 'Avg. time per call (incl. context-switch)',
+      m1r2v: '~3.5 min',
+      m1r2r: '2 min call + 1.5 min logging and follow-up',
+      m1r3l: 'Share that can be fully automated',
+      m1r3r: 'Remaining 30% are exceptions requiring a human',
+      m1r4l: 'Working days per year',
+      m1r4r: 'Standard operational shift schedule',
+      m1r5l: 'Fully-loaded ops agent hourly cost',
+      m1r5r: 'Salary + taxes + overhead, gross to employer',
+      m1r6l: 'Estimated annual savings',
+      m1r6r: '= 60 × 3.5 × 0.7 × 250 × ₪105 ÷ 60',
+      s3Title: 'Module 2 — Savings in driver time',
+      s3P: 'A driver checking 4 communication channels every morning (email, WhatsApp, SMS, paper) loses time that doesn\'t translate to value. The Portal consolidates everything onto a single screen.',
+      m2r1l: 'Active drivers',
+      m2r1r: 'Order of magnitude for a national-scale operation',
+      m2r2l: 'Daily time spent checking channels',
+      m2r2v: '~8-12 min',
+      m2r2r: 'Conservative; schedule-change days are higher',
+      m2r3l: 'Time saved with a unified channel',
+      m2r3r: '15% remain — initial scan and read-receipt',
+      m2r4l: 'Avg. working days per driver per year',
+      m2r4r: 'After vacation, holidays, weekends',
+      m2r5l: 'Total time saved across all drivers',
+      m2r5v: '~4,950 hours',
+      m2r5r: '= 400 × 10 × 0.75 × 220 ÷ 60',
+      s3FollowUp: "<strong>Value of driver time:</strong> Not included in the ₪ calculation. Drivers are paid per hour, not by productivity. But that time <strong>goes back into their quality of life</strong> — a real value that doesn't need a shekel sign to be worth stating.",
+      s4Title: "What the model excludes",
+      s4H3a: 'Cost side',
+      s4Pa: 'Development, licensing, cloud infrastructure, ongoing maintenance, training — not computed. The model is meant to estimate the <strong>upside</strong>, not net ROI. Project cost will be compared only when there is a real quote.',
+      s4H3b: 'Revenue side',
+      s4Pb: "Internal improvement doesn't generate direct revenue. Reducing operational errors (missed shifts, lateness) is worth money, but wasn't included because quantifying it accurately exceeds the scope of this format.",
+      s4Caveat: "<strong>How to read these numbers:</strong> Even in a conservative scenario that cuts assumptions by 20%, ROI stays meaningfully positive. This isn't a precise forecast — it's a <strong>sanity check</strong>, a framework for a decision, not a guarantee of outcome. Validation against real operational data is required before go-live.",
+      footerP: "Part of Nati Yevarkan's portfolio. Self-initiated analysis, not commissioned by any organization. © 2026"
+    },
+    he: {
+      backLink: '← חזרה ל-Case Study',
+      backLink2: '← חזרה ל-Case Study',
+      pageId: 'ROI',
+      eyebrow: 'Business Case',
+      heroH1: 'מודל ROI — חיסכון משוער, הנחות מתועדות',
+      heroLead: 'מודל מודולרי שמתרגם שיפור תהליכי לחיסכון כספי שנתי. כל הנחה מתועדת ופתוחה לאתגור. הסכומים הסופיים נגזרים ישירות מהפרמטרים שלמטה, ולא ניתנים לפרש בלי לערער על אחד מהם. (BRD סעיף 9)',
+      s1Title: 'השורה התחתונה',
+      num1: 'חיסכון שנתי משוער<br/>בשעות מוקד תפעולי',
+      num2: 'שעות מוקד שנחסכות<br/>מאוטומציה של תיאומים',
+      num3: 'סך זמן נהגים שנחסך<br/>על פני מאות עובדים',
+      s1Caveat: '<strong>הקשר:</strong> המספרים אינם נגזרים מנתוני תפעול של ארגון ספציפי, אלא הערכות מודולריות שנבנו על בסיס הנחות מתועדות. המודל הוא מסגרת ל-business case שניתן לאתגר ולשפר — לא תחזית.',
+      s2Title: 'מודול 1 — חיסכון בשעות מוקד תפעולי',
+      s2P: 'המוקד התפעולי שורף שיחות יומיות על תיאומי מוניות. כל שיחה ~3 דקות ממוצע, וקיימת תוספת על הסחת דעת בין שיחות. ה-Portal מאוטמט את הזרימה — נהג מבקש, רכב נקצה, מוקד מאשר רק חריגים.',
+      tblParam: 'פרמטר', tblValue: 'ערך', tblAssumption: 'הנחה',
+      tblParam2: 'פרמטר', tblValue2: 'ערך', tblAssumption2: 'הנחה',
+      m1r1l: 'שיחות תיאום מונית ביום',
+      m1r1r: 'מבוסס על אומדן תפעולי, נדרש אימות',
+      m1r2l: "זמן ממוצע לשיחה (כולל context-switch)",
+      m1r2v: "~3.5 דק'",
+      m1r2r: ' 2 דק\' שיחה + 1.5 דק\' רישום ומעקב',
+      m1r3l: 'אחוז שניתן לאוטמט מלא',
+      m1r3r: 'שאר 30% חריגים שדורשים אדם',
+      m1r4l: 'ימי עבודה בשנה',
+      m1r4r: 'נכון ל-shift תפעולי',
+      m1r5l: 'עלות שעת עובד מוקד (העמסה מלאה)',
+      m1r5r: 'שכר + מסים + תקורה, ברוטו ל-מעביד',
+      m1r6l: 'חיסכון שנתי משוער',
+      m1r6r: '= 60 × 3.5 × 0.7 × 250 × ₪105 ÷ 60',
+      s3Title: 'מודול 2 — חיסכון בזמן נהגים',
+      s3P: 'נהג שעובר על 4 ערוצי תקשורת בכל בוקר (אימייל, וואטסאפ, SMS, נייר) מבזבז זמן שלא מתחלף לערך. ה-Portal מרכז הכל למסך אחד.',
+      m2r1l: 'נהגים פעילים',
+      m2r1r: 'סדר גודל לארגון תפעולי בקנה מידה לאומי',
+      m2r2l: 'זמן יומי על בדיקת ערוצים',
+      m2r2v: "~8-12 דק'",
+      m2r2r: 'שמרני; ימי שינוי הם גבוהים יותר',
+      m2r3l: 'זמן שנחסך בערוץ מאוחד',
+      m2r3r: 'נשארים — בדיקה ראשונית ואישור קבלה 15%',
+      m2r4l: 'ימי עבודה ממוצע לנהג בשנה',
+      m2r4r: 'בניכוי חופשות, חגים, סופ"ש',
+      m2r5l: 'סך זמן נחסך לכל הנהגים',
+      m2r5v: '~4,950 שעות',
+      m2r5r: '= 400 × 10 × 0.75 × 220 ÷ 60',
+      s3FollowUp: '<strong>שווי זמן הנהגים:</strong> לא הוכנס לחישוב ה-₪. נהגים מקבלים שעה לחודש, לא לפי פרודוקטיביות. אבל הזמן הזה <strong>הולך לאיכות החיים שלהם</strong> — וזה ערך אמיתי שלא חייב להיות בש"ח כדי להיות שווה לאמירה.',
+      s4Title: 'מה לא נכלל במודל',
+      s4H3a: 'צד עלות',
+      s4Pa: 'פיתוח, רישוי, תשתית cloud, אחזקה שוטפת, training — לא חושבו. מטרת המודל היא להעריך את ה-<strong>upside</strong>, לא ROI נטו. עלות הפרויקט תושווה רק כשתהיה הצעת מחיר ממשית.',
+      s4H3b: 'צד הכנסה',
+      s4Pb: 'שיפור פנימי לא מייצר הכנסה ישירה. אבל הפחתת שגיאות תפעוליות (מפספסי משמרת, איחורים) שווה כסף — לא נכנסה למודל כי הקושי לכמת אותה גבוה מדי לפורמט הזה.',
+      s4Caveat: '<strong>קריאה נכונה של המספרים:</strong> גם בתרחיש שמרני שמוריד את ההנחות ב-20%, ה-ROI נשאר חיובי באופן משמעותי. זה לא תחזית מדויקת אלא <strong>תרגיל סבירות</strong> — מסגרת לקבלת החלטה, לא הבטחה לתוצאה. אימות מול נתוני תפעול אמיתיים יידרש לפני go-live.',
+      footerP: 'חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026'
+    }
+  };
+
+  const docMeta = {
+    en: {
+      title: 'ROI · Business Case — Driver Portal',
+      description: 'Estimated ROI model — ~₪84K annual savings, ~5,000 driver-hours. Documented assumptions.'
+    },
+    he: {
+      title: 'ROI · Business Case — Driver Portal',
+      description: 'מודל החזר השקעה משוער — חיסכון של ~₪84K בשנה, ~5,000 שעות נהג. הנחות מתועדות.'
+    }
+  };
+
+  function applyLanguage(lang) {
+    const dict = translations[lang];
+    if (!dict) return;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'he') ? 'rtl' : 'ltr';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    if (docMeta[lang]) {
+      document.title = docMeta[lang].title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', docMeta[lang].description);
+    }
+    const toggle = document.getElementById('langToggle');
+    if (toggle) {
+      toggle.textContent = (lang === 'en') ? 'HE' : 'EN';
+      toggle.setAttribute('aria-label', (lang === 'en') ? 'Switch to Hebrew' : 'Switch to English');
+    }
+    try { localStorage.setItem('siteLang', lang); } catch (e) {}
+  }
+
+  let initialLang = 'en';
+  try {
+    const stored = localStorage.getItem('siteLang');
+    if (stored === 'he' || stored === 'en') initialLang = stored;
+  } catch (e) {}
+  applyLanguage(initialLang);
+
+  const langToggleBtn = document.getElementById('langToggle');
+  if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.lang === 'he' ? 'he' : 'en';
+      applyLanguage(current === 'en' ? 'he' : 'en');
+    });
+  }
+</script>
 
 </body>
 </html>

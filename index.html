@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Driver Portal — Case Study · Nati Yevarkan</title>
-<meta name="description" content="פרויקט אפיון עצמאי של פלטפורמת ניהול נהגי רכבת — מ-11 שנים בקבינה ל-BRD מלא ופרוטוטייפ פעיל." />
+<title>Driver Portal · Case Study by Nati Yevarkan</title>
+<meta name="description" content="Self-initiated specification project for a railway driver operations platform. From 11 years in the cab to a full BRD and working prototype." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -77,6 +77,30 @@ nav.scrolled { border-bottom-color: var(--rule); }
   transition: transform 0.15s, background 0.15s;
 }
 .nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+
+.nav-actions { display: flex; align-items: center; gap: 12px; }
+.lang-toggle {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: background 0.15s, transform 0.15s, color 0.15s;
+}
+.lang-toggle:hover {
+  background: var(--ink);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Direction-aware arrow animation for CTA buttons */
+[dir="ltr"] .btn:hover .arrow { transform: translateX(4px); }
+[dir="rtl"] .btn:hover .arrow { transform: translateX(-4px); }
 
 /* ─────────── HERO ─────────── */
 .hero {
@@ -594,27 +618,25 @@ footer p { max-width: 720px; margin: 0 auto; text-align: center; }
 <!-- ═══════════════ NAV ═══════════════ -->
 <nav id="nav">
   <div class="container nav-inner">
-    <span class="nav-name">Nati Yevarkan · BA Portfolio</span>
-    <a href="app.html" class="nav-cta">נסה את הדמו ←</a>
+    <span class="nav-name" data-i18n="navName">Nati Yevarkan · BA Portfolio</span>
+    <div class="nav-actions">
+      <button class="lang-toggle" id="langToggle" aria-label="Switch language">HE</button>
+      <a href="app.html" class="nav-cta" data-i18n-html="navCta">Try the demo →</a>
+    </div>
   </div>
 </nav>
 
 <!-- ═══════════════ HERO ═══════════════ -->
 <header class="hero">
   <div class="container">
-    <span class="hero-eyebrow">Business Analyst · Self-Initiated Project</span>
-    <h1>Driver Portal —<br/>אפיון <span class="gradient-text">פלטפורמה תפעולית</span> לנהגי רכבת.</h1>
-    <p class="hero-sub">
-      פרויקט אפיון עצמאי שמתרגם בעיה תפעולית מורכבת — <strong>400 נהגים על 4 ערוצי תקשורת</strong> — ל-BRD מלא, מודל נתונים מנורמל, מפרט אינטגרציות, ופרוטוטייפ אינטראקטיבי.
+    <span class="hero-eyebrow" data-i18n="heroEyebrow">Business Analyst · Self-Initiated Project</span>
+    <h1 data-i18n-html="heroTitle">Driver Portal.<br/>An <span class="gradient-text">operations platform</span> for railway drivers.</h1>
+    <p class="hero-sub" data-i18n-html="heroSub">
+      A self-initiated specification project. Translates a complex operational problem of <strong>400 drivers across 4 communication channels</strong> into a full BRD, normalized data model, integrations spec, and interactive prototype.
     </p>
     <div class="cta-row">
-      <a href="app.html" class="btn primary">נסה את הדמו <span class="arrow">←</span></a>
-      <a href="Driver_Portal_BRD.pdf" class="btn secondary">קרא את ה-BRD</a>
-    </div>
-    <div class="hero-meta">
-      <span>BRD V2.2 · 25 עמודים</span>
-      <span>177 נהגים בייצור</span>
-      <span>5 מסכים אינטראקטיביים</span>
+      <a href="app.html" class="btn primary" data-i18n-html="heroBtnPrimary">Try the demo <span class="arrow">→</span></a>
+      <a href="Driver_Portal_BRD.pdf" class="btn secondary" data-i18n="heroBtnSecondary">Read the BRD</a>
     </div>
   </div>
 </header>
@@ -623,48 +645,44 @@ footer p { max-width: 720px; margin: 0 auto; text-align: center; }
 <section class="act">
   <div class="container">
     <div class="reveal">
-      <span class="act-label">01 · הבעיה</span>
-      <h2 class="act-title">ארבעה ערוצים. אפס מקור אמת.</h2>
-      <p class="act-lead">
-        בארגון תפעולי לאומי שמפעיל מאות נהגי רכבת, סידור העבודה היומי מתפזר על פני ערוצים שלא מדברים זה עם זה. שינויים ברגע האחרון? בעל-פה. אישור קבלה? אין. <strong>הסיכון מתגלגל לנהג שעומד לצאת למשמרת.</strong>
+      <span class="act-label" data-i18n="problemLabel">The Problem</span>
+      <h2 class="act-title" data-i18n="problemTitle">Four channels. Zero source of truth.</h2>
+      <p class="act-lead" data-i18n-html="problemLead">
+        In a national-scale rail operation running hundreds of drivers, the daily work schedule is distributed in parallel across multiple communication channels. Real-time updates are sometimes relayed verbally, with no unified acknowledgment mechanism. <strong>A clear opportunity for operational improvement.</strong>
       </p>
     </div>
 
     <div class="problem-viz reveal">
       <div class="chaos-stack">
-        <div class="channel"><span class="channel-ico">@</span><span>מייל</span></div>
-        <div class="channel"><span class="channel-ico">W</span><span>וואטסאפ</span></div>
-        <div class="channel"><span class="channel-ico">S</span><span>SMS</span></div>
-        <div class="channel"><span class="channel-ico">P</span><span>PDF</span></div>
+        <div class="channel"><span class="channel-ico">@</span><span data-i18n="channelEmail">Email</span></div>
+        <div class="channel"><span class="channel-ico">W</span><span data-i18n="channelWhatsapp">WhatsApp</span></div>
+        <div class="channel"><span class="channel-ico">S</span><span data-i18n="channelSms">SMS</span></div>
+        <div class="channel"><span class="channel-ico">P</span><span data-i18n="channelPdf">PDF</span></div>
       </div>
-      <div class="arrow-merge">←</div>
+      <div class="arrow-merge" data-i18n="arrowMerge">→</div>
       <div class="portal-card">
         <div class="icon-big">⚡</div>
         <div class="name">Driver Portal</div>
-        <div class="sub">single source of truth</div>
+        <div class="sub" data-i18n="portalSub">single source of truth</div>
       </div>
     </div>
 
     <div class="pain-cards">
       <div class="pain-card reveal">
         <div class="num">60</div>
-        <div class="desc">שיחות יומיות במוקד תפעולי</div>
-        <div class="unit">על תיאומי מוניות בלבד</div>
+        <div class="desc" data-i18n="pain1">Daily calls to the ops center</div>
       </div>
       <div class="pain-card reveal">
         <div class="num">8-12</div>
-        <div class="desc">דקות יומיות לכל נהג</div>
-        <div class="unit">בדיקה רוחבית בין ערוצים</div>
+        <div class="desc" data-i18n="pain2">Daily minutes per driver</div>
       </div>
       <div class="pain-card reveal">
         <div class="num">0</div>
-        <div class="desc">מנגנון read-receipt</div>
-        <div class="unit">מנהל לא יודע אם המסר הועבר</div>
+        <div class="desc" data-i18n="pain3">Read-receipt mechanism</div>
       </div>
       <div class="pain-card reveal">
         <div class="num">∞</div>
-        <div class="desc">מסרים שנבלעים בקבוצות WhatsApp</div>
-        <div class="unit">קריטיים ולא קריטיים — באותו רעש</div>
+        <div class="desc" data-i18n="pain4">Messages lost in WhatsApp groups</div>
       </div>
     </div>
   </div>
@@ -674,40 +692,36 @@ footer p { max-width: 720px; margin: 0 auto; text-align: center; }
 <section class="act process">
   <div class="container">
     <div class="reveal">
-      <span class="act-label">02 · התהליך</span>
-      <h2 class="act-title">ארבעה תוצרים. בסדר שבו נכתבו.</h2>
-      <p class="act-lead">
-        כל תוצר בנוי על הקודם. ה-BRD מגדיר את הבעיה והדרישות; <strong>המודל מתרגם אותן לישויות וקשרים</strong>; מפרט האינטגרציות מגדיר חיבור למערכות קיימות; ותהליכי As-Is/To-Be מציגים את הפער שמצדיק את ההשקעה.
+      <span class="act-label" data-i18n="processLabel">The Process</span>
+      <h2 class="act-title" data-i18n="processTitle">Solution architecture, step by step.</h2>
+      <p class="act-lead" data-i18n-html="processLead">
+        Each deliverable builds on the previous. The BRD defines the problem and requirements, <strong>the data model translates them into entities and relationships</strong>, the integrations spec defines connectivity to existing systems, and As-Is / To-Be flows show the gap that justifies the investment.
       </p>
     </div>
 
     <div class="process-steps">
       <a href="Driver_Portal_BRD.pdf" class="process-step reveal">
-        <div class="num">STEP 01</div>
-        <div class="title">BRD מלא</div>
-        <div class="desc">25 עמודים, 15 סעיפים: As-Is, FRs/NFRs, User Stories, Risk Register, Phased Roadmap. הכל אישר את עצמו בסבב הבא.</div>
-        <span class="link">קרא את המסמך ←</span>
+        <div class="title" data-i18n="step1Title">Full BRD</div>
+        <div class="desc" data-i18n="step1Desc">As-Is, FRs/NFRs, User Stories, Risk Register, Phased Roadmap.</div>
+        <span class="link" data-i18n="step1Link">Read the document →</span>
       </a>
 
       <a href="data.html" class="process-step reveal">
-        <div class="num">STEP 02</div>
-        <div class="title">מודל נתונים</div>
-        <div class="desc">6 ישויות, מפתחות עקביים, יחסים שמשרתים את הזרימות. ERD שמסביר את עצמו לפני שצריך לקרוא את ה-BRD.</div>
-        <span class="link">צפה ב-ERD ←</span>
+        <div class="title" data-i18n="step2Title">Data Model</div>
+        <div class="desc" data-i18n="step2Desc">6 entities, consistent keys, relationships built for the flows.</div>
+        <span class="link" data-i18n="step2Link">View ERD →</span>
       </a>
 
       <a href="api.html" class="process-step reveal">
-        <div class="num">STEP 03</div>
-        <div class="title">מפרט אינטגרציות</div>
-        <div class="desc">5 מערכות מקור, כל אחת עם fallback ספציפי. מה קורה כשהצד השני נופל? התשובה לא יכולה להיות "פנה לתמיכה".</div>
-        <span class="link">צפה במפרט ←</span>
+        <div class="title" data-i18n="step3Title">Integrations Spec</div>
+        <div class="desc" data-i18n="step3Desc">5 source systems, each with a specific fallback.</div>
+        <span class="link" data-i18n="step3Link">View spec →</span>
       </a>
 
       <a href="flow.html" class="process-step reveal">
-        <div class="num">STEP 04</div>
-        <div class="title">תהליכי As-Is / To-Be</div>
-        <div class="desc">2 תהליכי ליבה ממופים בשני המצבים. הספירה היא ההוכחה — 6 שלבים הופכים ל-5, 4 שיחות הופכות ל-0.</div>
-        <span class="link">צפה בתהליכים ←</span>
+        <div class="title" data-i18n="step4Title">As-Is / To-Be Flows</div>
+        <div class="desc" data-i18n="step4Desc">2 core flows. 6 steps become 5. 4 calls become 0.</div>
+        <span class="link" data-i18n="step4Link">View flows →</span>
       </a>
     </div>
   </div>
@@ -717,64 +731,36 @@ footer p { max-width: 720px; margin: 0 auto; text-align: center; }
 <section class="act">
   <div class="container">
     <div class="reveal">
-      <span class="act-label">03 · הפתרון</span>
-      <h2 class="act-title">פרוטוטייפ אינטראקטיבי.</h2>
-      <p class="act-lead">
-        5 מסכים, 2 פרסונות (נהג ומנהל), ולוגיקה עסקית לפי כללי ה-BRD. <strong>נבנה ב-React ורץ ללא שרת</strong> — אפשר לפתוח ולנסות את הזרימות באופן מלא, ללא התקנה.
+      <span class="act-label" data-i18n="solutionLabel">The Solution</span>
+      <h2 class="act-title" data-i18n="solutionTitle">An interactive prototype.</h2>
+      <p class="act-lead" data-i18n-html="solutionLead">
+        5 screens, 2 personas (driver and manager), business logic following the BRD rules. <strong>Built in React, runs serverless.</strong> Open it and run through the full flows. No installation required.
       </p>
     </div>
 
     <div class="solution-cta reveal">
-      <h3>נסה את הזרימות.</h3>
-      <p>5 מסכים · אישור מנהל · ולידציות מה-BRD · נתוני דמה סינתטיים</p>
-      <a href="app.html" class="btn primary">פתח את הדמו <span class="arrow">←</span></a>
+      <h3 data-i18n="solutionCtaTitle">Try the flows.</h3>
+      <a href="app.html" class="btn primary" data-i18n-html="solutionCtaBtn">Open the demo <span class="arrow">→</span></a>
     </div>
 
     <div class="numbers-grid">
       <div class="num-card reveal">
         <div class="big" data-target="177">0</div>
-        <div class="label">נהגים שעובדו<br/>מסידור עבודה אחד (PDF)</div>
+        <div class="label" data-i18n="num1Label">Drivers with a personalized view</div>
       </div>
       <div class="num-card reveal">
         <div class="big" data-target="1461">0</div>
-        <div class="label">משימות מנורמלות<br/>(task_sequence) במודל הנתונים</div>
+        <div class="label" data-i18n="num2Label">Normalized tasks in the data model</div>
       </div>
       <div class="num-card reveal">
         <div class="big" data-target="3">0</div>
-        <div class="label">סבבי תיקון<br/>כל אחד נולד מבאג ייצור</div>
+        <div class="label" data-i18n="num3Label">Iteration cycles, each from a production bug</div>
       </div>
     </div>
 
     <p style="text-align: center; margin-top: 32px; font-size: 14px; color: var(--muted);">
-      מספרים מה-pipeline שבניתי בפועל. <a href="roi.html" style="color: var(--accent); font-weight: 600;">מודל ROI מלא ←</a>
+      <a href="roi.html" style="color: var(--accent); font-weight: 600;" data-i18n="roiLink">Full ROI model →</a>
     </p>
-
-    <div class="deep-dives reveal">
-      <a href="data.html" class="deep-dive">
-        <div class="id">03 · DATA</div>
-        <div class="name">ERD &amp; Schema</div>
-        <div class="desc">6 ישויות, מפתחות עקביים, שיקולי נורמליזציה.</div>
-        <span class="read">צלילה לעומק ←</span>
-      </a>
-      <a href="api.html" class="deep-dive">
-        <div class="id">04 · API</div>
-        <div class="name">Integrations</div>
-        <div class="desc">5 מערכות, כל אחת עם fallback ספציפי.</div>
-        <span class="read">צלילה לעומק ←</span>
-      </a>
-      <a href="roi.html" class="deep-dive">
-        <div class="id">05 · ROI</div>
-        <div class="name">Business Case</div>
-        <div class="desc">~₪84K חיסכון שנתי, הנחות מתועדות.</div>
-        <span class="read">צלילה לעומק ←</span>
-      </a>
-      <a href="flow.html" class="deep-dive">
-        <div class="id">06 · FLOW</div>
-        <div class="name">Process Flows</div>
-        <div class="desc">As-Is / To-Be עם הספירה כהוכחה.</div>
-        <span class="read">צלילה לעומק ←</span>
-      </a>
-    </div>
   </div>
 </section>
 
@@ -782,17 +768,17 @@ footer p { max-width: 720px; margin: 0 auto; text-align: center; }
 <section class="about-section">
   <div class="container">
     <div class="reveal">
-      <span class="act-label">04 · About</span>
-      <h2 class="act-title">נתי יברקן.</h2>
+      <span class="act-label" data-i18n="aboutLabel">About</span>
+      <h2 class="act-title" data-i18n="aboutTitle">Nati Yevarkan.</h2>
     </div>
 
     <div class="about-grid reveal">
       <div class="about-text">
-        <p>
-          11+ שנים נהג רכבת נוסעים בארגון תפעולי בקנה מידה לאומי. בוגר תואר ראשון במנהל עסקים עם התמחות במערכות מידע (ממוצע 90), ובוגר קורס Data Analyst (ציון 95).
+        <p data-i18n="aboutP1">
+          11+ years as a passenger-train driver in a national-scale operational organization. B.A. in Business Administration, specialization in Information Systems (90 GPA), and a graduate of a Data Analyst program (score 95).
         </p>
-        <p>
-          במעבר ל-<strong>Business Analyst / Systems Analyst</strong> — תפקיד שמחבר בין השטח שאני מכיר לטכנולוגיה שאני לומד. הפרויקט הזה הוא ההוכחה.
+        <p data-i18n-html="aboutP2">
+          Transitioning to <strong>Business Analyst / Systems Analyst</strong>, a role that connects the operational field I know to the technology I'm learning. This project is the proof.
         </p>
       </div>
       <div class="contacts">
@@ -801,8 +787,8 @@ footer p { max-width: 720px; margin: 0 auto; text-align: center; }
           <a href="https://www.linkedin.com/in/nati-y" target="_blank" rel="noopener">linkedin.com/in/nati-y</a>
         </div>
         <div class="contact-row">
-          <span class="label">CV</span>
-          <a href="CV.pdf" target="_blank" rel="noopener">קו"ח · PDF</a>
+          <span class="label" data-i18n="contactCvLabel">CV</span>
+          <a href="CV.pdf" target="_blank" rel="noopener" data-i18n="contactCvLink">Résumé · PDF</a>
         </div>
         <div class="contact-row">
           <span class="label">Email</span>
@@ -866,6 +852,189 @@ footer p { max-width: 720px; margin: 0 auto; text-align: center; }
     });
   }, { threshold: 0.4 });
   counters.forEach(el => countObserver.observe(el));
+
+  /* ─────────── I18N / LANGUAGE TOGGLE ─────────── */
+  const translations = {
+    en: {
+      // NAV
+      navName: 'Nati Yevarkan · BA Portfolio',
+      navCta: 'Try the demo →',
+      // HERO
+      heroEyebrow: 'Business Analyst · Self-Initiated Project',
+      heroTitle: 'Driver Portal.<br/>An <span class="gradient-text">operations platform</span> for railway drivers.',
+      heroSub: 'A self-initiated specification project. Translates a complex operational problem of <strong>400 drivers across 4 communication channels</strong> into a full BRD, normalized data model, integrations spec, and interactive prototype.',
+      heroBtnPrimary: 'Try the demo <span class="arrow">→</span>',
+      heroBtnSecondary: 'Read the BRD',
+      // PROBLEM
+      problemLabel: 'The Problem',
+      problemTitle: 'Four channels. Zero source of truth.',
+      problemLead: 'In a national-scale rail operation running hundreds of drivers, the daily work schedule is distributed in parallel across multiple communication channels. Real-time updates are sometimes relayed verbally, with no unified acknowledgment mechanism. <strong>A clear opportunity for operational improvement.</strong>',
+      channelEmail: 'Email',
+      channelWhatsapp: 'WhatsApp',
+      channelSms: 'SMS',
+      channelPdf: 'PDF',
+      arrowMerge: '→',
+      portalSub: 'single source of truth',
+      pain1: 'Daily calls to the ops center',
+      pain2: 'Daily minutes per driver',
+      pain3: 'Read-receipt mechanism',
+      pain4: 'Messages lost in WhatsApp groups',
+      // PROCESS
+      processLabel: 'The Process',
+      processTitle: 'Solution architecture, step by step.',
+      processLead: 'Each deliverable builds on the previous. The BRD defines the problem and requirements, <strong>the data model translates them into entities and relationships</strong>, the integrations spec defines connectivity to existing systems, and As-Is / To-Be flows show the gap that justifies the investment.',
+      step1Title: 'Full BRD',
+      step1Desc: 'As-Is, FRs/NFRs, User Stories, Risk Register, Phased Roadmap.',
+      step1Link: 'Read the document →',
+      step2Title: 'Data Model',
+      step2Desc: '6 entities, consistent keys, relationships built for the flows.',
+      step2Link: 'View ERD →',
+      step3Title: 'Integrations Spec',
+      step3Desc: '5 source systems, each with a specific fallback.',
+      step3Link: 'View spec →',
+      step4Title: 'As-Is / To-Be Flows',
+      step4Desc: '2 core flows. 6 steps become 5. 4 calls become 0.',
+      step4Link: 'View flows →',
+      // SOLUTION
+      solutionLabel: 'The Solution',
+      solutionTitle: 'An interactive prototype.',
+      solutionLead: '5 screens, 2 personas (driver and manager), business logic following the BRD rules. <strong>Built in React, runs serverless.</strong> Open it and run through the full flows. No installation required.',
+      solutionCtaTitle: 'Try the flows.',
+      solutionCtaBtn: 'Open the demo <span class="arrow">→</span>',
+      num1Label: 'Drivers with a personalized view',
+      num2Label: 'Normalized tasks in the data model',
+      num3Label: 'Iteration cycles, each from a production bug',
+      roiLink: 'Full ROI model →',
+      // ABOUT
+      aboutLabel: 'About',
+      aboutTitle: 'Nati Yevarkan.',
+      aboutP1: "11+ years as a passenger-train driver in a national-scale operational organization. B.A. in Business Administration, specialization in Information Systems (90 GPA), and a graduate of a Data Analyst program (score 95).",
+      aboutP2: "Transitioning to <strong>Business Analyst / Systems Analyst</strong>, a role that connects the operational field I know to the technology I'm learning. This project is the proof.",
+      contactCvLabel: 'CV',
+      contactCvLink: 'Résumé · PDF'
+    },
+    he: {
+      // NAV
+      navName: 'נתי יברקן · תיק עבודות BA',
+      navCta: 'נסה את הדמו ←',
+      // HERO
+      heroEyebrow: 'Business Analyst · פרויקט עצמאי',
+      heroTitle: 'Driver Portal.<br/>אפיון <span class="gradient-text">פלטפורמה תפעולית</span> לנהגי רכבת.',
+      heroSub: 'פרויקט אפיון עצמאי שמתרגם בעיה תפעולית מורכבת של <strong>400 נהגים על 4 ערוצי תקשורת</strong> ל-BRD מלא, מודל נתונים מנורמל, מפרט אינטגרציות, ופרוטוטייפ אינטראקטיבי.',
+      heroBtnPrimary: 'נסה את הדמו <span class="arrow">←</span>',
+      heroBtnSecondary: 'קרא את ה-BRD',
+      // PROBLEM
+      problemLabel: 'הבעיה',
+      problemTitle: 'ארבעה ערוצים. אפס מקור אמת.',
+      problemLead: 'בארגון תפעולי לאומי שמפעיל מאות נהגי רכבת, סידור העבודה היומי מועבר במקביל דרך מספר ערוצי תקשורת. עדכונים בזמן אמת מתבצעים לעיתים בעל-פה, ואין מנגנון אחיד לאישור קבלה. <strong>זוהי הזדמנות ברורה לשיפור תפעולי.</strong>',
+      channelEmail: 'מייל',
+      channelWhatsapp: 'וואטסאפ',
+      channelSms: 'SMS',
+      channelPdf: 'PDF',
+      arrowMerge: '←',
+      portalSub: 'single source of truth',
+      pain1: 'שיחות יומיות במוקד תפעולי',
+      pain2: 'דקות יומיות לכל נהג',
+      pain3: 'מנגנון read-receipt',
+      pain4: 'מסרים שנבלעים בקבוצות WhatsApp',
+      // PROCESS
+      processLabel: 'התהליך',
+      processTitle: 'ארכיטקטורת הפתרון: שלב אחר שלב',
+      processLead: 'כל תוצר בנוי על הקודם. ה-BRD מגדיר את הבעיה והדרישות, <strong>המודל מתרגם אותן לישויות וקשרים</strong>, מפרט האינטגרציות מגדיר חיבור למערכות קיימות, ותהליכי As-Is/To-Be מציגים את הפער שמצדיק את ההשקעה.',
+      step1Title: 'BRD מלא',
+      step1Desc: 'As-Is, FRs/NFRs, User Stories, Risk Register, Phased Roadmap.',
+      step1Link: 'קרא את המסמך ←',
+      step2Title: 'מודל נתונים',
+      step2Desc: '6 ישויות, מפתחות עקביים, יחסים שמשרתים את הזרימות.',
+      step2Link: 'צפה ב-ERD ←',
+      step3Title: 'מפרט אינטגרציות',
+      step3Desc: '5 מערכות מקור, כל אחת עם fallback ספציפי.',
+      step3Link: 'צפה במפרט ←',
+      step4Title: 'תהליכי As-Is / To-Be',
+      step4Desc: '2 תהליכי ליבה. 6 שלבים הופכים ל-5. 4 שיחות הופכות ל-0.',
+      step4Link: 'צפה בתהליכים ←',
+      // SOLUTION
+      solutionLabel: 'הפתרון',
+      solutionTitle: 'פרוטוטייפ אינטראקטיבי.',
+      solutionLead: '5 מסכים, 2 פרסונות (נהג ומנהל), ולוגיקה עסקית לפי כללי ה-BRD. <strong>נבנה ב-React ורץ ללא שרת.</strong> אפשר לפתוח ולנסות את הזרימות באופן מלא, ללא התקנה.',
+      solutionCtaTitle: 'נסה את הזרימות.',
+      solutionCtaBtn: 'פתח את הדמו <span class="arrow">←</span>',
+      num1Label: 'נהגים בעלי תצוגה אישית מובנית',
+      num2Label: 'משימות מנורמלות במודל הנתונים',
+      num3Label: 'סבבי תיקון, כל אחד מבאג ייצור',
+      roiLink: 'מודל ROI מלא ←',
+      // ABOUT
+      aboutLabel: 'אודות',
+      aboutTitle: 'נתי יברקן.',
+      aboutP1: '11+ שנים נהג רכבת נוסעים בארגון תפעולי בקנה מידה לאומי. בוגר תואר ראשון במנהל עסקים עם התמחות במערכות מידע (ממוצע 90), ובוגר קורס Data Analyst (ציון 95).',
+      aboutP2: 'במעבר ל-<strong>Business Analyst / Systems Analyst</strong>, תפקיד שמחבר בין השטח שאני מכיר לטכנולוגיה שאני לומד. הפרויקט הזה הוא ההוכחה.',
+      contactCvLabel: 'קו"ח',
+      contactCvLink: 'קו"ח · PDF'
+    }
+  };
+
+  const docMeta = {
+    en: {
+      title: 'Driver Portal · Case Study by Nati Yevarkan',
+      description: 'Self-initiated specification project for a railway driver operations platform. From 11 years in the cab to a full BRD and working prototype.'
+    },
+    he: {
+      title: 'Driver Portal — Case Study · נתי יברקן',
+      description: 'פרויקט אפיון עצמאי של פלטפורמת ניהול נהגי רכבת — מ-11 שנים בקבינה ל-BRD מלא ופרוטוטייפ פעיל.'
+    }
+  };
+
+  function applyLanguage(lang) {
+    const dict = translations[lang];
+    if (!dict) return;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'he') ? 'rtl' : 'ltr';
+
+    // textContent nodes
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+
+    // innerHTML nodes (preserve nested <strong>, <span>, <br>)
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+
+    // Meta + title
+    if (docMeta[lang]) {
+      document.title = docMeta[lang].title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', docMeta[lang].description);
+    }
+
+    // Toggle button shows the OTHER language
+    const toggle = document.getElementById('langToggle');
+    if (toggle) {
+      toggle.textContent = (lang === 'en') ? 'HE' : 'EN';
+      toggle.setAttribute('aria-label', (lang === 'en') ? 'Switch to Hebrew' : 'Switch to English');
+    }
+
+    try { localStorage.setItem('siteLang', lang); } catch (e) {}
+  }
+
+  // Init on load — respect stored choice, default EN
+  let initialLang = 'en';
+  try {
+    const stored = localStorage.getItem('siteLang');
+    if (stored === 'he' || stored === 'en') initialLang = stored;
+  } catch (e) {}
+  applyLanguage(initialLang);
+
+  // Toggle click
+  const langToggleBtn = document.getElementById('langToggle');
+  if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.lang === 'he' ? 'he' : 'en';
+      applyLanguage(current === 'en' ? 'he' : 'en');
+    });
+  }
 </script>
 
 </body>

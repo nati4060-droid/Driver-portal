@@ -1,19 +1,38 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>פורטל הנהג — דמו</title>
+  <title>Driver Portal — Interactive Demo</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.10/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #e5e7eb; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; direction: rtl; }
+    body { background: #e5e7eb; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; }
     input, button, select, textarea { font-family: inherit; }
     @keyframes pulse {
       0%, 80%, 100% { opacity: 0.3; }
       40% { opacity: 1; }
+    }
+    /* Language toggle button */
+    .lang-toggle-btn {
+      background: rgba(15, 23, 42, 0.06);
+      color: #0F172A;
+      border: none;
+      cursor: pointer;
+      padding: 7px 14px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', 'Menlo', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      transition: background 0.15s, color 0.15s, transform 0.15s;
+    }
+    .lang-toggle-btn:hover {
+      background: #0F172A;
+      color: #fff;
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -21,158 +40,517 @@
 <div id="root"></div>
 
 <script type="text/babel">
-// ─── מצב הדגמה: נתונים סטטיים מוטמעים, ללא שרת ──────────────────────────────────
-// (הגרסה המקורית ניגשה ל-http://localhost:8000 עם נתוני נהגים אמיתיים)
+/* ═══════════════════════════════════════════════════════════════════════════
+ * I18N — Bilingual content with canonical English keys for enums.
+ * Driver Portal demo, EN default, persists choice via localStorage('siteLang').
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
-const DEMO_HOME = {
-  driver: { name: "דני כהן", personal_id: "795268", mirs_id: "MIC4471" },
-  today: {
-    date: "2026-06-09", start: "05:40", end: "13:10", num: 3,
-    stationStart: "לוד", stationEnd: "באר שבע", shiftType: "בוקר",
-    trains: ["4112", "4117", "4124"],
-    hasBdek: true, bdekTrain: "4112",
-    hasTaxi: false,
-    notes: "החלפת נהג בתחנת לוד",
-    task_sequence: ["לוד 05:40", "רכבת 4112", "באר שבע 07:25", "רכבת 4117", "לוד 09:50", "רכבת 4124", "באר שבע 13:10"]
+const I18N = {
+  en: {
+    /* App-wide */
+    appTitle: 'Driver Portal',
+    appOrg: 'National rail operations · Demo',
+    /* Device toggle */
+    devicePhone: '📱 Driver phone',
+    devicePhoneSub: 'Before / after shift',
+    deviceTablet: '🚆 Cab tablet',
+    deviceTabletSub: 'During the ride',
+    deviceChannelNote: 'Multi-channel by procedure — during the ride the phone is not in use; operational features live on the cab tablet',
+    /* Login */
+    loginIdLabel: 'Employee number / MIRS',
+    loginPlaceholder: 'e.g. 795268',
+    loginHint: 'Demo mode — type any number and continue',
+    loginBtn: 'Sign in',
+    loginBtnLoading: 'Signing in…',
+    /* Home */
+    homeGreeting: 'Hello',
+    homeEmployeeNo: 'Employee #',
+    homeMirsLabel: 'MIRS',
+    homeTodayHeader: 'Your schedule today',
+    homeNoToday: 'No schedule today',
+    homeTomorrowHeader: 'Tomorrow',
+    homeTomorrowNew: 'New',
+    homeNoTomorrow: 'No schedule tomorrow',
+    homeBtnHistory: '📅 Shift history',
+    homeBtnRequests: '📋 My requests',
+    homeBtnManager: '👔 Switch to approver view (demo — the other side of the process)',
+    homeCabinChatTitle: "Procedures chat available on the cab tablet",
+    homeCabinChatBody: 'Operational features in-ride live on the tablet mounted in the cab, per the no-phone-in-cab policy',
+    /* Today card */
+    todayLabel: 'Today',
+    tomorrowLabel: 'Tomorrow',
+    trainsSequence: 'Train sequence',
+    inspection: '🔧 Inspection',
+    inspectionTrain: 'Inspection — train',
+    taxiBoth: '🚕 Pickup (both ways)',
+    taxiStart: '🚕 Pickup at start',
+    taxiEnd: '🚕 Pickup at end',
+    walkIn: '🚶 Self arrival',
+    notesPrefix: '📝',
+    /* History */
+    historyTitle: 'Shift history',
+    historyLoading: 'Loading…',
+    historyEmpty: 'No history to show',
+    leaveDay: 'Leave',
+    /* Requests */
+    requestsTitle: 'My requests',
+    requestsPendingSuffix: 'pending approval',
+    requestsNewBtn: '+ New leave / absence request',
+    requestsEmpty: 'No requests yet — submit your first request above',
+    requestSubmitted: 'Submitted on',
+    requestApprover: '',
+    requestPendingNote: '⏳ Request is waiting for unit manager approval',
+    requestDaysSuffix: 'days',
+    /* New Request */
+    newRequestTitle: 'New request',
+    nrType: 'Request type',
+    nrFromDate: 'From date',
+    nrDate: 'Date',
+    nrToDate: 'To date',
+    nrNotes: 'Notes (optional)',
+    nrNotesPlaceholder: 'e.g. family event',
+    nrSubmit: 'Submit for approval',
+    nrFooter: 'Request will be forwarded to the driver-unit manager',
+    nrSuccessTitle: 'Request sent',
+    nrSuccessBody: 'Request registered in status "Pending"<br/>and forwarded for unit manager approval',
+    nrBackToRequests: 'Back to my requests',
+    errMissingStart: 'Missing start date',
+    errMissingEnd: 'Missing end date',
+    errPastStart: "Start date is in the past — retroactive requests aren't allowed",
+    errEndBeforeStart: 'End date is earlier than start date',
+    errNoticeTpl: (type, days) => `${type} requires submission at least ${days} days in advance`,
+    /* Manager */
+    mgrTitle: 'Request approval — unit manager',
+    mgrSub: 'Demo view of the approver side',
+    mgrPending: 'Pending decisions',
+    mgrEmpty: 'No pending requests 🎉',
+    mgrDecided: 'Recently decided',
+    mgrApproveBtn: '✓ Approve',
+    mgrRejectBtn: '✗ Reject',
+    mgrConfirmReject: 'Confirm rejection',
+    mgrCancel: 'Cancel',
+    mgrRejectPlaceholder: 'Reason for rejection (required)',
+    mgrApproveDecision: 'Approved. Replacement driver assigned.',
+    mgrManagerName: 'Driver Unit Manager — M. Levi',
+    /* Chat */
+    chatTitle: 'Procedures chat',
+    chatPhase: 'Phase 2 · Beta',
+    chatBasedOn: 'Based on the official procedures repository',
+    chatDisclaimer: '⚠️ For reference only · Does not replace the official procedure or traffic control instructions',
+    chatGreet: 'Hello, how can I help?',
+    chatGreetSub: 'Ask about procedures, speed limits, or fault handling',
+    chatSuggestedTitle: 'Suggested questions',
+    chatPlaceholder: 'Type a question…',
+    chatSend: 'Send',
+    chatNoAnswer: 'No direct answer found in the procedures repository in this demo.\n\nIn production — RAG retrieval over the organization\'s official procedures repository, with a source citation for every answer.\n\nTry one of the suggested questions below ↓',
+    /* Tablet */
+    tabletStripLabel: 'Cab tablet',
+    tabletDriver: 'Driver',
+    tabletShift: 'Shift',
+    tabletPassenger: 'Passenger',
+    tabletActiveShift: 'Active shift',
+    /* Shift types — display labels */
+    shiftType_morning: 'Morning',
+    shiftType_afternoon: 'Afternoon',
+    shiftType_night: 'Night',
+    shiftType_leave: 'Leave',
+    shiftType_standby: 'Standby',
+    shiftType_onCall: 'On-call',
+    /* Status — display labels */
+    status_pending: 'Pending',
+    status_approved: 'Approved',
+    status_rejected: 'Rejected',
+    /* Request types — display labels */
+    reqType_annualLeave: 'Annual leave',
+    reqType_personalDay: 'Personal day',
+    reqType_otherLeave: 'Other absence',
+    /* Request rule descriptions */
+    reqRule_annualLeave: 'Submit at least 14 days before start date',
+    reqRule_personalDay: 'Submit at least 3 days before date',
+    reqRule_otherLeave: 'Submit at least 7 days in advance',
+    /* Days of the week */
+    day_sun: 'Sunday', day_mon: 'Monday', day_tue: 'Tuesday', day_wed: 'Wednesday',
+    day_thu: 'Thursday', day_fri: 'Friday', day_sat: 'Saturday',
+    dayPrefix: ''
   },
-  tomorrow: {
-    date: "2026-06-10", start: "13:30", end: "21:55", num: 7,
-    stationStart: "תל אביב", stationEnd: "נהריה", shiftType: "צהריים",
-    trains: ["118", "123", "130"],
-    hasBdek: false,
-    hasTaxi: true, taxiPosition: "both",
-    notes: ""
+  he: {
+    appTitle: 'פורטל הנהג',
+    appOrg: 'ארגון תפעולי לאומי · דמו',
+    devicePhone: '📱 פלאפון נהג',
+    devicePhoneSub: 'לפני / אחרי משמרת',
+    deviceTablet: '🚆 טאבלט קבינה',
+    deviceTabletSub: 'בזמן נסיעה',
+    deviceChannelNote: 'מודל רב-ערוצי לפי נוהל — בזמן נסיעה הפלאפון אינו בשימוש; פיצ\'רים תפעוליים זמינים בטאבלט הקבינה',
+    loginIdLabel: 'מספר עובד / MIRS',
+    loginPlaceholder: 'לדוגמה: 795268',
+    loginHint: 'מצב הדגמה — הקלידו כל מספר והמשיכו',
+    loginBtn: 'כניסה',
+    loginBtnLoading: 'מתחבר...',
+    homeGreeting: 'שלום',
+    homeEmployeeNo: 'מספר עובד:',
+    homeMirsLabel: 'MIRS',
+    homeTodayHeader: 'הסידור שלך היום',
+    homeNoToday: 'אין סידור להיום',
+    homeTomorrowHeader: 'סידור מחר',
+    homeTomorrowNew: 'חדש',
+    homeNoTomorrow: 'אין סידור למחר',
+    homeBtnHistory: '📅 היסטוריית משמרות',
+    homeBtnRequests: '📋 הבקשות שלי',
+    homeBtnManager: '👔 מעבר לתצוגת מאשר (דמו — הצד השני של התהליך)',
+    homeCabinChatTitle: 'צ\'אט נהלים זמין בטאבלט הקבינה',
+    homeCabinChatBody: 'פיצ\'רים תפעוליים בזמן הנסיעה נמצאים בטאבלט המותקן בקבינה, בהתאם לנוהל איסור שימוש בפלאפון בתא הנהג',
+    todayLabel: 'היום',
+    tomorrowLabel: 'מחר',
+    trainsSequence: 'רצף רכבות',
+    inspection: '🔧 בדק',
+    inspectionTrain: 'בדק — רכבת',
+    taxiBoth: '🚕 פטיש (הלוך וחזור)',
+    taxiStart: '🚕 פטיש בהתחלה',
+    taxiEnd: '🚕 פטיש בסוף',
+    walkIn: '🚶 הגעה עצמית',
+    notesPrefix: '📝',
+    historyTitle: 'היסטוריית משמרות',
+    historyLoading: 'טוען...',
+    historyEmpty: 'אין היסטוריה להציג',
+    leaveDay: 'חופש',
+    requestsTitle: 'הבקשות שלי',
+    requestsPendingSuffix: 'ממתינות לאישור',
+    requestsNewBtn: '+ בקשת חופשה / היעדרות חדשה',
+    requestsEmpty: 'אין בקשות עדיין — הגישו בקשה ראשונה למעלה',
+    requestSubmitted: 'הוגשה ב-',
+    requestApprover: '',
+    requestPendingNote: '⏳ הבקשה ממתינה לאישור מנהל היחידה',
+    requestDaysSuffix: 'ימים',
+    newRequestTitle: 'בקשה חדשה',
+    nrType: 'סוג הבקשה',
+    nrFromDate: 'מתאריך',
+    nrDate: 'תאריך',
+    nrToDate: 'עד תאריך',
+    nrNotes: 'הערות (לא חובה)',
+    nrNotesPlaceholder: 'לדוגמה: אירוע משפחתי',
+    nrSubmit: 'שליחת הבקשה לאישור',
+    nrFooter: 'הבקשה תועבר לאישור מנהל יחידת הנהגים',
+    nrSuccessTitle: 'הבקשה נשלחה',
+    nrSuccessBody: 'הבקשה נקלטה במערכת בסטטוס "ממתינה"<br/>ותועבר לאישור מנהל היחידה',
+    nrBackToRequests: 'חזרה לבקשות שלי',
+    errMissingStart: 'חסר תאריך התחלה',
+    errMissingEnd: 'חסר תאריך סיום',
+    errPastStart: 'תאריך ההתחלה כבר עבר — לא ניתן להגיש בקשה רטרואקטיבית',
+    errEndBeforeStart: 'תאריך הסיום מוקדם מתאריך ההתחלה',
+    errNoticeTpl: (type, days) => `${type} מחייבת הגשה לפחות ${days} ימים מראש`,
+    mgrTitle: 'אישור בקשות — מנהל יחידה',
+    mgrSub: 'תצוגת דמו של צד המאשר בתהליך',
+    mgrPending: 'ממתינות להחלטה',
+    mgrEmpty: 'אין בקשות ממתינות 🎉',
+    mgrDecided: 'הוחלטו לאחרונה',
+    mgrApproveBtn: '✓ אישור',
+    mgrRejectBtn: '✗ דחייה',
+    mgrConfirmReject: 'אישור הדחייה',
+    mgrCancel: 'ביטול',
+    mgrRejectPlaceholder: 'נימוק לדחייה (חובה)',
+    mgrApproveDecision: 'אושר. שובץ נהג מחליף.',
+    mgrManagerName: 'מנהל יחידת נהגים — מ. לוי',
+    chatTitle: 'צ\'אט נהלים',
+    chatPhase: 'Phase 2 · Beta',
+    chatBasedOn: 'מבוסס על מאגר הנהלים הרשמי',
+    chatDisclaimer: '⚠️ מידע לעיון בלבד · אינו מחליף את הנוהל הרשמי או הוראות מוקד תנועה',
+    chatGreet: 'שלום, איך אפשר לעזור?',
+    chatGreetSub: 'שאל שאלה על נהלים, מהירויות מותרות, או התנהלות בתקלה',
+    chatSuggestedTitle: 'שאלות מוצעות',
+    chatPlaceholder: 'כתוב שאלה...',
+    chatSend: 'שלח',
+    chatNoAnswer: 'לא נמצאה תשובה ישירה במאגר הנהלים בדמו זה.\n\nבמערכת ייצור — שליפת RAG מעל מאגר הנהלים הרשמי של הארגון, עם ציטוט מקור לכל תשובה.\n\nנסה אחת מהשאלות המוצעות למטה ↓',
+    tabletStripLabel: 'טאבלט קבינה',
+    tabletDriver: 'נהג',
+    tabletShift: 'משמרת',
+    tabletPassenger: 'נוסע',
+    tabletActiveShift: 'משמרת פעילה',
+    shiftType_morning: 'בוקר',
+    shiftType_afternoon: 'צהריים',
+    shiftType_night: 'לילה',
+    shiftType_leave: 'חופש',
+    shiftType_standby: 'כוננות תפעולית',
+    shiftType_onCall: 'כוננות',
+    status_pending: 'ממתינה',
+    status_approved: 'אושרה',
+    status_rejected: 'נדחתה',
+    reqType_annualLeave: 'חופשה שנתית',
+    reqType_personalDay: 'יום אישי',
+    reqType_otherLeave: 'בקשת היעדרות אחרת',
+    reqRule_annualLeave: 'הגשה עד 14 יום לפני תאריך ההתחלה',
+    reqRule_personalDay: 'הגשה עד 3 ימים לפני התאריך',
+    reqRule_otherLeave: 'הגשה עד 7 ימים מראש',
+    day_sun: 'ראשון', day_mon: 'שני', day_tue: 'שלישי', day_wed: 'רביעי',
+    day_thu: 'חמישי', day_fri: 'שישי', day_sat: 'שבת',
+    dayPrefix: 'יום '
   }
 };
 
-const DEMO_HISTORY = [
-  { date:"2026-06-08", start:"22:10", end:"06:30", num:12, stationStart:"חיפה מרכז", stationEnd:"תל אביב", shiftType:"לילה",
-    trains:["730","735"], hasBdek:false, hasTaxi:true, taxiPosition:"start", notes:"",
-    task_sequence:["חיפה מרכז 22:10","רכבת 730","ת\"א סבידור 23:55","כוננות","רכבת 735","חיפה 06:30"] },
-  { date:"2026-06-07", shiftType:"חופש", trains:[] },
-  { date:"2026-06-06", start:"06:00", end:"14:20", num:5, stationStart:"באר שבע", stationEnd:"תל אביב", shiftType:"בוקר",
-    trains:["209","214","221"], hasBdek:true, bdekTrain:"209", hasTaxi:false, notes:"",
-    task_sequence:["באר שבע 06:00","רכבת 209","ת\"א 07:35","רכבת 214","באר שבע 09:50","רכבת 221","ת\"א 14:20"] },
-  { date:"2026-06-05", start:"14:00", end:"22:10", num:9, stationStart:"תל אביב", stationEnd:"נהריה", shiftType:"צהריים",
-    trains:["116","121"], hasBdek:false, hasTaxi:false, notes:"" },
-  { date:"2026-06-04", start:"05:15", end:"12:50", num:2, stationStart:"לוד", stationEnd:"חיפה מרכז", shiftType:"בוקר",
-    trains:["402","407","412"], hasBdek:false, hasTaxi:true, taxiPosition:"end", notes:"" },
-  { date:"2026-06-03", start:"08:00", end:"16:00", num:0, stationStart:"לוד", stationEnd:"לוד", shiftType:"standby",
-    trains:[], hasBdek:false, hasTaxi:false, notes:"כוננות מילואים תפעולית" },
-  { date:"2026-06-02", shiftType:"חופש", trains:[] },
-  { date:"2026-06-01", start:"13:45", end:"21:30", num:8, stationStart:"מודיעין", stationEnd:"הרצליה", shiftType:"צהריים",
-    trains:["622","627"], hasBdek:false, hasTaxi:false, notes:"" },
-  { date:"2026-05-31", start:"23:00", end:"07:10", num:14, stationStart:"תל אביב", stationEnd:"באר שבע", shiftType:"לילה",
-    trains:["318","323"], hasBdek:true, bdekTrain:"318", hasTaxi:true, taxiPosition:"both", notes:"" }
-];
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Demo data — bilingual.
+ * (Original version queried http://localhost:8000 for real driver data)
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
-// בקשות לדוגמה — מדגימות את מחזור החיים המלא: ממתינה / אושרה / נדחתה
-const DEMO_REQUESTS = [
-  { id: 3, type: "חופשה שנתית", startDate: "2026-07-12", endDate: "2026-07-16",
-    notes: "חופשה משפחתית", status: "ממתינה", createdAt: "2026-06-07",
-    approver: null, decisionNote: null },
-  { id: 2, type: "יום אישי", startDate: "2026-06-21", endDate: "2026-06-21",
-    notes: "סידורים אישיים", status: "אושרה", createdAt: "2026-06-01",
-    approver: "מנהל יחידת נהגים — מ. לוי", decisionNote: "אושר. שובץ נהג מחליף." },
-  { id: 1, type: "חופשה שנתית", startDate: "2026-06-14", endDate: "2026-06-18",
-    notes: "", status: "נדחתה", createdAt: "2026-05-28",
-    approver: "מנהל יחידת נהגים — מ. לוי", decisionNote: "מחסור בנהגים בתקופה המבוקשת. ניתן להגיש מחדש לשבוע העוקב." },
-];
-
-// כללים עסקיים (מתוך ה-BRD): התראה מינימלית לפי סוג בקשה
-const REQUEST_RULES = {
-  "חופשה שנתית": { minNoticeDays: 14, label: "הגשה עד 14 יום לפני תאריך ההתחלה" },
-  "יום אישי":    { minNoticeDays: 3,  label: "הגשה עד 3 ימים לפני התאריך" },
-  "בקשת היעדרות אחרת": { minNoticeDays: 7, label: "הגשה עד 7 ימים מראש" },
+const DEMO_DATA = {
+  en: {
+    home: {
+      driver: { name: "Dan Cohen", personal_id: "795268", mirs_id: "MIC4471" },
+      today: {
+        date: "2026-06-09", start: "05:40", end: "13:10", num: 3,
+        stationStart: "Lod", stationEnd: "Be'er Sheva", shiftType: "morning",
+        trains: ["4112", "4117", "4124"],
+        hasBdek: true, bdekTrain: "4112",
+        hasTaxi: false,
+        notes: "Driver swap at Lod station",
+        task_sequence: ["Lod 05:40", "Train 4112", "Be'er Sheva 07:25", "Train 4117", "Lod 09:50", "Train 4124", "Be'er Sheva 13:10"]
+      },
+      tomorrow: {
+        date: "2026-06-10", start: "13:30", end: "21:55", num: 7,
+        stationStart: "Tel Aviv", stationEnd: "Nahariya", shiftType: "afternoon",
+        trains: ["118", "123", "130"],
+        hasBdek: false,
+        hasTaxi: true, taxiPosition: "both",
+        notes: ""
+      }
+    },
+    history: [
+      { date:"2026-06-08", start:"22:10", end:"06:30", num:12, stationStart:"Haifa Central", stationEnd:"Tel Aviv", shiftType:"night",
+        trains:["730","735"], hasBdek:false, hasTaxi:true, taxiPosition:"start", notes:"",
+        task_sequence:["Haifa Central 22:10","Train 730","TA Savidor 23:55","Standby","Train 735","Haifa 06:30"] },
+      { date:"2026-06-07", shiftType:"leave", trains:[] },
+      { date:"2026-06-06", start:"06:00", end:"14:20", num:5, stationStart:"Be'er Sheva", stationEnd:"Tel Aviv", shiftType:"morning",
+        trains:["209","214","221"], hasBdek:true, bdekTrain:"209", hasTaxi:false, notes:"",
+        task_sequence:["Be'er Sheva 06:00","Train 209","TA 07:35","Train 214","Be'er Sheva 09:50","Train 221","TA 14:20"] },
+      { date:"2026-06-05", start:"14:00", end:"22:10", num:9, stationStart:"Tel Aviv", stationEnd:"Nahariya", shiftType:"afternoon",
+        trains:["116","121"], hasBdek:false, hasTaxi:false, notes:"" },
+      { date:"2026-06-04", start:"05:15", end:"12:50", num:2, stationStart:"Lod", stationEnd:"Haifa Central", shiftType:"morning",
+        trains:["402","407","412"], hasBdek:false, hasTaxi:true, taxiPosition:"end", notes:"" },
+      { date:"2026-06-03", start:"08:00", end:"16:00", num:0, stationStart:"Lod", stationEnd:"Lod", shiftType:"standby",
+        trains:[], hasBdek:false, hasTaxi:false, notes:"Operational reserve standby" },
+      { date:"2026-06-02", shiftType:"leave", trains:[] },
+      { date:"2026-06-01", start:"13:45", end:"21:30", num:8, stationStart:"Modi'in", stationEnd:"Herzliya", shiftType:"afternoon",
+        trains:["622","627"], hasBdek:false, hasTaxi:false, notes:"" },
+      { date:"2026-05-31", start:"23:00", end:"07:10", num:14, stationStart:"Tel Aviv", stationEnd:"Be'er Sheva", shiftType:"night",
+        trains:["318","323"], hasBdek:true, bdekTrain:"318", hasTaxi:true, taxiPosition:"both", notes:"" }
+    ],
+    requests: [
+      { id: 3, type: "annualLeave", startDate: "2026-07-12", endDate: "2026-07-16",
+        notes: "Family vacation", status: "pending", createdAt: "2026-06-07",
+        approver: null, decisionNote: null },
+      { id: 2, type: "personalDay", startDate: "2026-06-21", endDate: "2026-06-21",
+        notes: "Personal errands", status: "approved", createdAt: "2026-06-01",
+        approver: "Driver Unit Manager — M. Levi", decisionNote: "Approved. Replacement driver assigned." },
+      { id: 1, type: "annualLeave", startDate: "2026-06-14", endDate: "2026-06-18",
+        notes: "", status: "rejected", createdAt: "2026-05-28",
+        approver: "Driver Unit Manager — M. Levi", decisionNote: "Driver shortage during the requested period. Resubmission for the following week is possible." }
+    ]
+  },
+  he: {
+    home: {
+      driver: { name: "דני כהן", personal_id: "795268", mirs_id: "MIC4471" },
+      today: {
+        date: "2026-06-09", start: "05:40", end: "13:10", num: 3,
+        stationStart: "לוד", stationEnd: "באר שבע", shiftType: "morning",
+        trains: ["4112", "4117", "4124"],
+        hasBdek: true, bdekTrain: "4112",
+        hasTaxi: false,
+        notes: "החלפת נהג בתחנת לוד",
+        task_sequence: ["לוד 05:40", "רכבת 4112", "באר שבע 07:25", "רכבת 4117", "לוד 09:50", "רכבת 4124", "באר שבע 13:10"]
+      },
+      tomorrow: {
+        date: "2026-06-10", start: "13:30", end: "21:55", num: 7,
+        stationStart: "תל אביב", stationEnd: "נהריה", shiftType: "afternoon",
+        trains: ["118", "123", "130"],
+        hasBdek: false,
+        hasTaxi: true, taxiPosition: "both",
+        notes: ""
+      }
+    },
+    history: [
+      { date:"2026-06-08", start:"22:10", end:"06:30", num:12, stationStart:"חיפה מרכז", stationEnd:"תל אביב", shiftType:"night",
+        trains:["730","735"], hasBdek:false, hasTaxi:true, taxiPosition:"start", notes:"",
+        task_sequence:["חיפה מרכז 22:10","רכבת 730","ת\"א סבידור 23:55","כוננות","רכבת 735","חיפה 06:30"] },
+      { date:"2026-06-07", shiftType:"leave", trains:[] },
+      { date:"2026-06-06", start:"06:00", end:"14:20", num:5, stationStart:"באר שבע", stationEnd:"תל אביב", shiftType:"morning",
+        trains:["209","214","221"], hasBdek:true, bdekTrain:"209", hasTaxi:false, notes:"",
+        task_sequence:["באר שבע 06:00","רכבת 209","ת\"א 07:35","רכבת 214","באר שבע 09:50","רכבת 221","ת\"א 14:20"] },
+      { date:"2026-06-05", start:"14:00", end:"22:10", num:9, stationStart:"תל אביב", stationEnd:"נהריה", shiftType:"afternoon",
+        trains:["116","121"], hasBdek:false, hasTaxi:false, notes:"" },
+      { date:"2026-06-04", start:"05:15", end:"12:50", num:2, stationStart:"לוד", stationEnd:"חיפה מרכז", shiftType:"morning",
+        trains:["402","407","412"], hasBdek:false, hasTaxi:true, taxiPosition:"end", notes:"" },
+      { date:"2026-06-03", start:"08:00", end:"16:00", num:0, stationStart:"לוד", stationEnd:"לוד", shiftType:"standby",
+        trains:[], hasBdek:false, hasTaxi:false, notes:"כוננות מילואים תפעולית" },
+      { date:"2026-06-02", shiftType:"leave", trains:[] },
+      { date:"2026-06-01", start:"13:45", end:"21:30", num:8, stationStart:"מודיעין", stationEnd:"הרצליה", shiftType:"afternoon",
+        trains:["622","627"], hasBdek:false, hasTaxi:false, notes:"" },
+      { date:"2026-05-31", start:"23:00", end:"07:10", num:14, stationStart:"תל אביב", stationEnd:"באר שבע", shiftType:"night",
+        trains:["318","323"], hasBdek:true, bdekTrain:"318", hasTaxi:true, taxiPosition:"both", notes:"" }
+    ],
+    requests: [
+      { id: 3, type: "annualLeave", startDate: "2026-07-12", endDate: "2026-07-16",
+        notes: "חופשה משפחתית", status: "pending", createdAt: "2026-06-07",
+        approver: null, decisionNote: null },
+      { id: 2, type: "personalDay", startDate: "2026-06-21", endDate: "2026-06-21",
+        notes: "סידורים אישיים", status: "approved", createdAt: "2026-06-01",
+        approver: "מנהל יחידת נהגים — מ. לוי", decisionNote: "אושר. שובץ נהג מחליף." },
+      { id: 1, type: "annualLeave", startDate: "2026-06-14", endDate: "2026-06-18",
+        notes: "", status: "rejected", createdAt: "2026-05-28",
+        approver: "מנהל יחידת נהגים — מ. לוי", decisionNote: "מחסור בנהגים בתקופה המבוקשת. ניתן להגיש מחדש לשבוע העוקב." }
+    ]
+  }
 };
 
-// "היום" של הדמו — מקובע כדי שהנתונים הסטטיים יישארו עקביים
+/* Business rules from the BRD: minimum notice per request type */
+const REQUEST_RULES = {
+  annualLeave:  { minNoticeDays: 14 },
+  personalDay:  { minNoticeDays: 3 },
+  otherLeave:   { minNoticeDays: 7 }
+};
+
+/* "Today" for the demo — fixed so static data stays consistent */
 const DEMO_TODAY = "2026-06-09";
 
-// ─── מאגר תשובות צ'אט נהלים (Phase 2 — Beta) ─────────────────────────────────
-// תשובות מוכנות לתרחישי הדגמה. בייצור — שליפה מ-RAG מעל מאגר נהלים מאושר.
-const CHAT_KB = [
-  {
-    keywords: ["מהירות", "מותרת", "קמ\"ש", "קמש", "מקסימלית"],
-    answer: "המהירות המותרת תלויה בקטע ובסוג הרכבת:\n• רכבת נוסעים בקטע פתוח: עד 160 קמ\"ש\n• כניסה/יציאה מתחנה: עד 40 קמ\"ש\n• מעבר במחלף או צומת: עד 60 קמ\"ש\n• בקטע עם עבודות תחזוקה: לפי שלט הגבלה זמני\n\nתמיד יש להתייחס לאיתות ולשילוט בשטח כקובע.",
-    source: "נוהל תפעול נסיעה 04.2 — מהירויות מותרות, סעיף 3",
-    tags: ["מהירות", "תפעול"]
-  },
-  {
-    keywords: ["איתות", "אדום", "עצירה", "אות"],
-    answer: "באיתות אדום:\n1. עצירה מלאה לפני האיתות\n2. דיווח מיידי למוקד תנועה דרך קשר\n3. אין להמשיך עד קבלת אישור מפורש או החלפת האיתות\n4. תיעוד האירוע ביומן הנסיעה\n\nאיתות אדום שלא משתנה תוך 3 דקות — דיווח חוזר למוקד.",
-    source: "נוהל בטיחות 02.1 — התנהלות באיתותים, סעיף 7",
-    tags: ["בטיחות", "איתות"]
-  },
-  {
-    keywords: ["תקלה", "מנוע", "פנים", "טכנית"],
-    answer: "בתקלה טכנית באמצע נסיעה:\n1. הערכת חומרה — האם ניתן להמשיך?\n2. דיווח למוקד תנועה ומוקד טכני\n3. אם לא ניתן להמשיך — עצירה במיקום בטוח (לא בגשר, מנהרה, או מחלף)\n4. הפעלת תאורת חירום והודעה לנוסעים\n5. המתנה להוראות מוקד\n\nאין לבצע ניסיונות תיקון עצמאיים מעבר לאיפוסים מאושרים.",
-    source: "נוהל תקלות 06.3 — התנהלות בתקלה בנסיעה",
-    tags: ["תקלות", "חירום"]
-  },
-  {
-    keywords: ["חצייה", "פסים", "מפגש", "רכב"],
-    answer: "במפגש מפלסי עם רכב על הפסים:\n1. הפעלת בלם חירום מיידי\n2. הפעלת צופר רציף\n3. דיווח מיידי למוקד תנועה\n4. אם התנגשות בלתי נמנעת — שמירה על קבינה סגורה ומיגון\n5. לאחר עצירה — אין לרדת לפסים לפני אישור מוקד\n\nתיעוד מלא של האירוע נדרש בסיום המשמרת.",
-    source: "נוהל חירום 01.4 — מפגשים מפלסיים, סעיף 2",
-    tags: ["חירום", "מפגש"]
-  },
-  {
-    keywords: ["נוסע", "חולה", "אירוע", "רפואי", "פצוע"],
-    answer: "באירוע רפואי של נוסע:\n1. דיווח מיידי למוקד תנועה ובקשת מד\"א לתחנה הקרובה\n2. המשך נסיעה לתחנה הקרובה אלא אם הורה מוקד אחרת\n3. הודעה לנוסעים על עצירה לא מתוכננת\n4. תיאום עם צוות תחנה לקבלת הצוות הרפואי\n\nאין לעצור בקטע פתוח אלא בהוראת מוקד מפורשת.",
-    source: "נוהל שירות 08.2 — אירועי נוסעים, סעיף 5",
-    tags: ["נוסעים", "חירום"]
-  },
-  {
-    keywords: ["מנוחה", "שעות", "משמרת", "רצופה"],
-    answer: "מגבלות זמן עבודה לנהג:\n• משמרת רגילה: עד 9 שעות\n• משמרת מורחבת (באישור): עד 11 שעות\n• מנוחה בין משמרות: לפחות 11 שעות רצופות\n• מנוחה שבועית: לפחות 36 שעות רצופות בכל 7 ימים\n\nבמקרה של חריגה צפויה — דיווח מוקדם ככל הניתן ליחידת הסידור.",
-    source: "נוהל כוח אדם 11.1 — שעות עבודה ומנוחה",
-    tags: ["שעות", "מנוחה"]
-  }
-];
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Procedures chat KB — bilingual
+ * Curated answers for demo scenarios. In production — RAG over an approved
+ * procedures repository.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const CHAT_KB = {
+  en: [
+    {
+      keywords: ["speed", "limit", "kph", "mph", "maximum"],
+      answer: "Permitted speed depends on the segment and train type:\n• Passenger train on open segment: up to 160 km/h\n• Station entry / exit: up to 40 km/h\n• Crossing or junction: up to 60 km/h\n• Segment under maintenance: per temporary signage\n\nAlways defer to signals and on-site signage as authoritative.",
+      source: "Operations Procedure 04.2 — Permitted speeds, §3",
+      tags: ["speed", "operations"]
+    },
+    {
+      keywords: ["signal", "red", "stop"],
+      answer: "On a red signal:\n1. Full stop before the signal\n2. Immediate report to traffic control via radio\n3. Do not proceed until explicit authorization or the signal changes\n4. Log the event in the trip journal\n\nA red signal unchanged for over 3 minutes — repeat report to control.",
+      source: "Safety Procedure 02.1 — Signal handling, §7",
+      tags: ["safety", "signal"]
+    },
+    {
+      keywords: ["fault", "engine", "technical", "malfunction"],
+      answer: "On a technical fault mid-ride:\n1. Severity assessment — can we continue?\n2. Report to traffic control and technical desk\n3. If we cannot continue — stop in a safe location (not on a bridge, tunnel, or junction)\n4. Activate emergency lighting and notify passengers\n5. Wait for control instructions\n\nDo not attempt self-repair beyond approved resets.",
+      source: "Faults Procedure 06.3 — Handling a fault during ride",
+      tags: ["faults", "emergency"]
+    },
+    {
+      keywords: ["crossing", "tracks", "vehicle", "level"],
+      answer: "At a level crossing with a vehicle on the tracks:\n1. Apply emergency brake immediately\n2. Sound continuous horn\n3. Immediate report to traffic control\n4. If collision unavoidable — keep cab closed and braced\n5. After stopping — do not descend to the tracks before control authorization\n\nFull documentation of the event is required at end of shift.",
+      source: "Emergency Procedure 01.4 — Level crossings, §2",
+      tags: ["emergency", "crossing"]
+    },
+    {
+      keywords: ["passenger", "ill", "medical", "injured"],
+      answer: "On a passenger medical event:\n1. Immediate report to traffic control and request MDA at the nearest station\n2. Continue to the nearest station unless control orders otherwise\n3. Announce unplanned stop to passengers\n4. Coordinate with station staff to receive the medical team\n\nDo not stop on open segment except by explicit control instruction.",
+      source: "Service Procedure 08.2 — Passenger events, §5",
+      tags: ["passengers", "emergency"]
+    },
+    {
+      keywords: ["rest", "hours", "shift", "continuous"],
+      answer: "Driver work time limits:\n• Standard shift: up to 9 hours\n• Extended shift (with approval): up to 11 hours\n• Rest between shifts: at least 11 continuous hours\n• Weekly rest: at least 36 continuous hours every 7 days\n\nIn case of expected exceedance — report to the scheduling unit as early as possible.",
+      source: "HR Procedure 11.1 — Work hours and rest",
+      tags: ["hours", "rest"]
+    }
+  ],
+  he: [
+    {
+      keywords: ["מהירות", "מותרת", "קמ\"ש", "קמש", "מקסימלית"],
+      answer: "המהירות המותרת תלויה בקטע ובסוג הרכבת:\n• רכבת נוסעים בקטע פתוח: עד 160 קמ\"ש\n• כניסה/יציאה מתחנה: עד 40 קמ\"ש\n• מעבר במחלף או צומת: עד 60 קמ\"ש\n• בקטע עם עבודות תחזוקה: לפי שלט הגבלה זמני\n\nתמיד יש להתייחס לאיתות ולשילוט בשטח כקובע.",
+      source: "נוהל תפעול נסיעה 04.2 — מהירויות מותרות, סעיף 3",
+      tags: ["מהירות", "תפעול"]
+    },
+    {
+      keywords: ["איתות", "אדום", "עצירה", "אות"],
+      answer: "באיתות אדום:\n1. עצירה מלאה לפני האיתות\n2. דיווח מיידי למוקד תנועה דרך קשר\n3. אין להמשיך עד קבלת אישור מפורש או החלפת האיתות\n4. תיעוד האירוע ביומן הנסיעה\n\nאיתות אדום שלא משתנה תוך 3 דקות — דיווח חוזר למוקד.",
+      source: "נוהל בטיחות 02.1 — התנהלות באיתותים, סעיף 7",
+      tags: ["בטיחות", "איתות"]
+    },
+    {
+      keywords: ["תקלה", "מנוע", "פנים", "טכנית"],
+      answer: "בתקלה טכנית באמצע נסיעה:\n1. הערכת חומרה — האם ניתן להמשיך?\n2. דיווח למוקד תנועה ומוקד טכני\n3. אם לא ניתן להמשיך — עצירה במיקום בטוח (לא בגשר, מנהרה, או מחלף)\n4. הפעלת תאורת חירום והודעה לנוסעים\n5. המתנה להוראות מוקד\n\nאין לבצע ניסיונות תיקון עצמאיים מעבר לאיפוסים מאושרים.",
+      source: "נוהל תקלות 06.3 — התנהלות בתקלה בנסיעה",
+      tags: ["תקלות", "חירום"]
+    },
+    {
+      keywords: ["חצייה", "פסים", "מפגש", "רכב"],
+      answer: "במפגש מפלסי עם רכב על הפסים:\n1. הפעלת בלם חירום מיידי\n2. הפעלת צופר רציף\n3. דיווח מיידי למוקד תנועה\n4. אם התנגשות בלתי נמנעת — שמירה על קבינה סגורה ומיגון\n5. לאחר עצירה — אין לרדת לפסים לפני אישור מוקד\n\nתיעוד מלא של האירוע נדרש בסיום המשמרת.",
+      source: "נוהל חירום 01.4 — מפגשים מפלסיים, סעיף 2",
+      tags: ["חירום", "מפגש"]
+    },
+    {
+      keywords: ["נוסע", "חולה", "אירוע", "רפואי", "פצוע"],
+      answer: "באירוע רפואי של נוסע:\n1. דיווח מיידי למוקד תנועה ובקשת מד\"א לתחנה הקרובה\n2. המשך נסיעה לתחנה הקרובה אלא אם הורה מוקד אחרת\n3. הודעה לנוסעים על עצירה לא מתוכננת\n4. תיאום עם צוות תחנה לקבלת הצוות הרפואי\n\nאין לעצור בקטע פתוח אלא בהוראת מוקד מפורשת.",
+      source: "נוהל שירות 08.2 — אירועי נוסעים, סעיף 5",
+      tags: ["נוסעים", "חירום"]
+    },
+    {
+      keywords: ["מנוחה", "שעות", "משמרת", "רצופה"],
+      answer: "מגבלות זמן עבודה לנהג:\n• משמרת רגילה: עד 9 שעות\n• משמרת מורחבת (באישור): עד 11 שעות\n• מנוחה בין משמרות: לפחות 11 שעות רצופות\n• מנוחה שבועית: לפחות 36 שעות רצופות בכל 7 ימים\n\nבמקרה של חריגה צפויה — דיווח מוקדם ככל הניתן ליחידת הסידור.",
+      source: "נוהל כוח אדם 11.1 — שעות עבודה ומנוחה",
+      tags: ["שעות", "מנוחה"]
+    }
+  ]
+};
 
-// שאלות מוצעות שמופיעות במסך הצ'אט הריק
-const CHAT_SUGGESTED = [
-  "מה המהירות המותרת בכניסה לתחנה?",
-  "מה לעשות באיתות אדום?",
-  "התנהלות בתקלה טכנית בנסיעה",
-  "כמה שעות מנוחה נדרשות בין משמרות?"
-];
+const CHAT_SUGGESTED = {
+  en: [
+    "What is the speed limit when entering a station?",
+    "What to do on a red signal?",
+    "Handling a technical fault during a ride",
+    "How many hours of rest are required between shifts?"
+  ],
+  he: [
+    "מה המהירות המותרת בכניסה לתחנה?",
+    "מה לעשות באיתות אדום?",
+    "התנהלות בתקלה טכנית בנסיעה",
+    "כמה שעות מנוחה נדרשות בין משמרות?"
+  ]
+};
 
-// התאמת שאלה לתשובה מהמאגר — חיפוש מילות מפתח פשוט (Phase 2 ייתן RAG אמיתי)
-function findChatAnswer(query) {
+function findChatAnswer(query, lang) {
   if (!query || !query.trim()) return null;
-  const q = query.trim();
+  const q = query.trim().toLowerCase();
+  const kb = CHAT_KB[lang] || CHAT_KB.en;
   let best = null, bestScore = 0;
-  for (const item of CHAT_KB) {
-    const score = item.keywords.filter(k => q.includes(k)).length;
+  for (const item of kb) {
+    const score = item.keywords.filter(k => q.includes(k.toLowerCase())).length;
     if (score > bestScore) { bestScore = score; best = item; }
   }
   return bestScore > 0 ? best : null;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Helpers
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
-function hebrewDate(isoDate) {
+const DAY_KEYS = ['day_sun','day_mon','day_tue','day_wed','day_thu','day_fri','day_sat'];
+
+function formatDate(isoDate, t) {
   if (!isoDate) return "";
   const [y, m, d] = isoDate.split("-");
-  const days = ["ראשון","שני","שלישי","רביעי","חמישי","שישי","שבת"];
   const dt = new Date(`${y}-${m}-${d}T12:00:00`);
-  return `יום ${days[dt.getDay()]} ${d}/${m}/${y}`;
+  const dayName = t(DAY_KEYS[dt.getDay()]);
+  const prefix = t('dayPrefix');
+  return `${prefix}${dayName} ${d}/${m}/${y}`;
 }
 
+/* Canonical English keys for shiftType — bilingual-safe color lookup */
 function shiftColor(type) {
-  if (type === "בוקר")   return { bg: "#FEF3C7", color: "#92400E" };
-  if (type === "צהריים") return { bg: "#DBEAFE", color: "#1E40AF" };
-  if (type === "לילה")   return { bg: "#EDE9FE", color: "#5B21B6" };
-  if (type === "חופש")   return { bg: "#D1FAE5", color: "#065F46" };
-  if (type === "standby" || type === "כוננות") return { bg: "#F3F4F6", color: "#374151" };
+  if (type === "morning")   return { bg: "#FEF3C7", color: "#92400E" };
+  if (type === "afternoon") return { bg: "#DBEAFE", color: "#1E40AF" };
+  if (type === "night")     return { bg: "#EDE9FE", color: "#5B21B6" };
+  if (type === "leave")     return { bg: "#D1FAE5", color: "#065F46" };
+  if (type === "standby" || type === "onCall") return { bg: "#F3F4F6", color: "#374151" };
   return { bg: "#F3F4F6", color: "#374151" };
 }
 
+/* Canonical English keys for status */
 function statusStyle(status) {
-  if (status === "אושרה")  return { bg: "#D1FAE5", color: "#065F46", dot: "#10B981" };
-  if (status === "נדחתה")  return { bg: "#FEE2E2", color: "#991B1B", dot: "#EF4444" };
-  return { bg: "#FEF3C7", color: "#92400E", dot: "#F59E0B" }; // ממתינה
+  if (status === "approved") return { bg: "#D1FAE5", color: "#065F46", dot: "#10B981" };
+  if (status === "rejected") return { bg: "#FEE2E2", color: "#991B1B", dot: "#EF4444" };
+  return { bg: "#FEF3C7", color: "#92400E", dot: "#F59E0B" }; // pending
 }
 
 function daysBetween(fromIso, toIso) {
@@ -180,13 +558,24 @@ function daysBetween(fromIso, toIso) {
   return Math.round(ms / 86400000);
 }
 
-// ─── Components ───────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+ * I18N Context — gives every component access to `t(key)` and `lang`
+ * ═══════════════════════════════════════════════════════════════════════════ */
+const LangContext = React.createContext({ lang: 'en', t: (k) => k });
+
+function useT() {
+  return React.useContext(LangContext);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Components
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
 function TrainRow({ trains }) {
   if (!trains || trains.length === 0) return null;
   return (
     <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap", direction:"ltr", marginTop:8 }}>
-      {trains.map((t, i) => (
+      {trains.map((tr, i) => (
         <React.Fragment key={i}>
           <div style={{
             background: i===0 ? "#1E40AF" : "#EFF6FF",
@@ -195,7 +584,7 @@ function TrainRow({ trains }) {
             padding:"5px 11px", borderRadius:8,
             border: i===0 ? "none" : "1.5px solid #BFDBFE",
             fontFamily:"monospace", letterSpacing:1,
-          }}>{t}</div>
+          }}>{tr}</div>
           {i < trains.length-1 && <span style={{ color:"#93C5FD", fontSize:16, fontWeight:700 }}>→</span>}
         </React.Fragment>
       ))}
@@ -204,24 +593,24 @@ function TrainRow({ trains }) {
 }
 
 function TodayCard({ schedule, isTomorrow }) {
+  const { t } = useT();
   if (!schedule) return (
     <div style={{
       background:"#F9FAFB", borderRadius:18, padding:"24px 20px",
       border:"2px dashed #D1D5DB", textAlign:"center", color:"#9CA3AF", marginBottom:14
     }}>
       <div style={{ fontSize:32, marginBottom:8 }}>📭</div>
-      <div style={{ fontWeight:600 }}>אין סידור {isTomorrow ? "למחר" : "להיום"}</div>
+      <div style={{ fontWeight:600 }}>{isTomorrow ? t('homeNoTomorrow') : t('homeNoToday')}</div>
     </div>
   );
 
-  const sc = shiftColor(schedule.shiftType);
   return (
     <div style={{
       background:"linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%)",
       borderRadius:18, padding:"18px 18px 16px", marginBottom:14, color:"#fff",
     }}>
       <div style={{ fontSize:12, opacity:0.7, marginBottom:4 }}>
-        {isTomorrow ? "מחר" : "היום"} — {hebrewDate(schedule.date)}
+        {isTomorrow ? t('tomorrowLabel') : t('todayLabel')} — {formatDate(schedule.date, t)}
       </div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:12 }}>
         <div style={{ fontSize:28, fontWeight:800, letterSpacing:-0.5 }}>
@@ -237,10 +626,10 @@ function TodayCard({ schedule, isTomorrow }) {
 
       {schedule.trains && schedule.trains.length > 0 && (
         <>
-          <div style={{ fontSize:12, opacity:0.6, marginBottom:6 }}>רצף רכבות</div>
+          <div style={{ fontSize:12, opacity:0.6, marginBottom:6 }}>{t('trainsSequence')}</div>
           <div style={{ background:"rgba(255,255,255,0.1)", borderRadius:12, padding:"10px 14px" }}>
             <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap", direction:"ltr" }}>
-              {schedule.trains.map((t, i) => (
+              {schedule.trains.map((tr, i) => (
                 <React.Fragment key={i}>
                   <div style={{
                     background: i===0 ? "#fff" : "rgba(255,255,255,0.15)",
@@ -249,7 +638,7 @@ function TodayCard({ schedule, isTomorrow }) {
                     padding:"6px 12px", borderRadius:10,
                     fontFamily:"monospace", letterSpacing:1.5,
                     border: i===0 ? "none" : "1px solid rgba(255,255,255,0.25)",
-                  }}>{t}</div>
+                  }}>{tr}</div>
                   {i < schedule.trains.length-1 &&
                     <span style={{ fontSize:20, fontWeight:800, opacity:0.6 }}>→</span>}
                 </React.Fragment>
@@ -261,21 +650,21 @@ function TodayCard({ schedule, isTomorrow }) {
 
       <div style={{ display:"flex", gap:12, marginTop:12, fontSize:12, flexWrap:"wrap" }}>
         <span style={{ opacity:0.8 }}>📍 {schedule.stationStart} → {schedule.stationEnd}</span>
-        {schedule.hasBdek && <span style={{ opacity:0.8 }}>🔧 בדק</span>}
+        {schedule.hasBdek && <span style={{ opacity:0.8 }}>{t('inspection')}</span>}
         {schedule.hasTaxi
-          ? <span style={{ opacity:0.8 }}>🚕 {schedule.taxiPosition === "both" ? "פטיש (הלוך וחזור)" : schedule.taxiPosition === "start" ? "פטיש בהתחלה" : "פטיש בסוף"}</span>
-          : <span style={{ opacity:0.8 }}>🚶 הגעה עצמית</span>
+          ? <span style={{ opacity:0.8 }}>{schedule.taxiPosition === "both" ? t('taxiBoth') : schedule.taxiPosition === "start" ? t('taxiStart') : t('taxiEnd')}</span>
+          : <span style={{ opacity:0.8 }}>{t('walkIn')}</span>
         }
         {schedule.shiftType && (
           <span style={{ background:"rgba(255,255,255,0.2)", padding:"2px 8px", borderRadius:6, opacity:0.9 }}>
-            {schedule.shiftType}
+            {t('shiftType_' + schedule.shiftType)}
           </span>
         )}
       </div>
 
       {schedule.notes && (
         <div style={{ marginTop:10, padding:"8px 12px", background:"rgba(255,200,0,0.2)", borderRadius:10, fontSize:12 }}>
-          📝 {schedule.notes}
+          {t('notesPrefix')} {schedule.notes}
         </div>
       )}
     </div>
@@ -283,6 +672,7 @@ function TodayCard({ schedule, isTomorrow }) {
 }
 
 function HistoryCard({ schedule, onClick, isOpen }) {
+  const { t } = useT();
   const sc = shiftColor(schedule.shiftType);
   return (
     <div onClick={onClick} style={{
@@ -291,14 +681,14 @@ function HistoryCard({ schedule, onClick, isOpen }) {
     }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
-          <div style={{ fontWeight:600, fontSize:14, color:"#1a1a1a" }}>{hebrewDate(schedule.date)}</div>
+          <div style={{ fontWeight:600, fontSize:14, color:"#1a1a1a" }}>{formatDate(schedule.date, t)}</div>
           {schedule.start
             ? <div style={{ color:"#555", fontSize:13, marginTop:2 }}>{schedule.start} — {schedule.end} | {schedule.stationStart}</div>
-            : <div style={{ color:"#16A34A", fontSize:13, marginTop:2 }}>🌴 {schedule.shiftType || "חופש"}</div>
+            : <div style={{ color:"#16A34A", fontSize:13, marginTop:2 }}>🌴 {t('shiftType_' + (schedule.shiftType || 'leave'))}</div>
           }
         </div>
         <span style={{ fontSize:11, padding:"3px 8px", borderRadius:8, background:sc.bg, color:sc.color, fontWeight:600, whiteSpace:"nowrap" }}>
-          {schedule.shiftType || "—"}
+          {schedule.shiftType ? t('shiftType_' + schedule.shiftType) : "—"}
         </span>
       </div>
 
@@ -307,8 +697,8 @@ function HistoryCard({ schedule, onClick, isOpen }) {
       {isOpen && (
         <div style={{ marginTop:10, padding:"10px 12px", background:"#F9FAFB", borderRadius:10, border:"1px solid #E5E7EB", fontSize:13, color:"#444" }}>
           <div>📍 {schedule.stationStart} → {schedule.stationEnd}</div>
-          {schedule.hasBdek && <div style={{ marginTop:4 }}>🔧 בדק — רכבת {schedule.bdekTrain}</div>}
-          {schedule.notes && <div style={{ marginTop:4 }}>📝 {schedule.notes}</div>}
+          {schedule.hasBdek && <div style={{ marginTop:4 }}>🔧 {t('inspectionTrain')} {schedule.bdekTrain}</div>}
+          {schedule.notes && <div style={{ marginTop:4 }}>{t('notesPrefix')} {schedule.notes}</div>}
           {schedule.task_sequence && schedule.task_sequence.length > 0 && (
             <div style={{ marginTop:8, fontSize:12, color:"#6B7280", direction:"ltr" }}>
               {schedule.task_sequence.join(" → ")}
@@ -320,9 +710,12 @@ function HistoryCard({ schedule, onClick, isOpen }) {
   );
 }
 
-// ─── Screens ──────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Screens
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
-function LoginScreen({ onLogin }) {
+function LoginScreen({ onLogin, defaultHome }) {
+  const { t } = useT();
   const [id, setId] = React.useState("");
   const [error, setError] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -331,9 +724,8 @@ function LoginScreen({ onLogin }) {
     if (!id.trim() || loading) return;
     setLoading(true);
     setError("");
-    // מצב הדגמה — מחזיר נהג לדוגמה לכל קלט, ללא קריאת רשת
     setTimeout(() => {
-      onLogin(DEMO_HOME);
+      onLogin(defaultHome);
       setLoading(false);
     }, 400);
   }
@@ -346,17 +738,17 @@ function LoginScreen({ onLogin }) {
         display:"flex", alignItems:"center", justifyContent:"center",
         fontSize:36, marginBottom:20
       }}>🚆</div>
-      <div style={{ fontSize:22, fontWeight:800, color:"#1a1a1a", marginBottom:4 }}>פורטל הנהג</div>
-      <div style={{ fontSize:13, color:"#888", marginBottom:32 }}>ארגון תפעולי לאומי · דמו</div>
+      <div style={{ fontSize:22, fontWeight:800, color:"#1a1a1a", marginBottom:4 }}>{t('appTitle')}</div>
+      <div style={{ fontSize:13, color:"#888", marginBottom:32 }}>{t('appOrg')}</div>
 
       <div style={{ width:"100%" }}>
-        <label style={{ fontSize:13, color:"#555", display:"block", marginBottom:6 }}>מספר עובד / MIRS</label>
+        <label style={{ fontSize:13, color:"#555", display:"block", marginBottom:6 }}>{t('loginIdLabel')}</label>
         <input
           type="text"
           value={id}
           onChange={e => setId(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter") handleLogin(); }}
-          placeholder="לדוגמה: 795268"
+          placeholder={t('loginPlaceholder')}
           style={{
             width:"100%", padding:"14px 16px", borderRadius:14,
             border:"2px solid #E5E7EB", fontSize:20, textAlign:"center",
@@ -367,7 +759,7 @@ function LoginScreen({ onLogin }) {
           onBlur={e => e.target.style.borderColor = "#E5E7EB"}
         />
         <div style={{ fontSize:12, color:"#9CA3AF", textAlign:"center", marginBottom:14 }}>
-          מצב הדגמה — הקלידו כל מספר והמשיכו
+          {t('loginHint')}
         </div>
         {error && <div style={{ color:"#DC2626", fontSize:13, marginBottom:12, textAlign:"center" }}>{error}</div>}
         <button
@@ -380,7 +772,7 @@ function LoginScreen({ onLogin }) {
             fontSize:16, fontWeight:700, cursor: loading ? "default" : "pointer"
           }}
         >
-          {loading ? "מתחבר..." : "כניסה"}
+          {loading ? t('loginBtnLoading') : t('loginBtn')}
         </button>
       </div>
     </div>
@@ -388,6 +780,7 @@ function LoginScreen({ onLogin }) {
 }
 
 function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, onLogout }) {
+  const { t } = useT();
   const { driver, today, tomorrow } = homeData;
   const initial = driver.name ? driver.name.trim().split(" ").map(w=>w[0]).slice(0,2).join("") : "?";
 
@@ -399,9 +792,9 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
         display:"flex", alignItems:"center", justifyContent:"space-between"
       }}>
         <div>
-          <div style={{ fontSize:18, fontWeight:700, color:"#1a1a1a" }}>פורטל הנהג</div>
-          <div style={{ fontSize:12, color:"#888" }}>שלום, {driver.name} 👋</div>
-          <div style={{ fontSize:11, color:"#6B7280", marginTop:4 }}>מספר עובד: {driver.personal_id} {driver.mirs_id ? `| MIRS: ${driver.mirs_id}` : ""}</div>
+          <div style={{ fontSize:18, fontWeight:700, color:"#1a1a1a" }}>{t('appTitle')}</div>
+          <div style={{ fontSize:12, color:"#888" }}>{t('homeGreeting')}, {driver.name} 👋</div>
+          <div style={{ fontSize:11, color:"#6B7280", marginTop:4 }}>{t('homeEmployeeNo')} {driver.personal_id} {driver.mirs_id ? `| ${t('homeMirsLabel')}: ${driver.mirs_id}` : ""}</div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div style={{
@@ -419,7 +812,7 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
       <div style={{ padding:"14px 16px" }}>
         {/* Today */}
         <div style={{ fontSize:14, fontWeight:600, color:"#555", marginBottom:10 }}>
-          {today ? "הסידור שלך היום" : "אין סידור להיום"}
+          {today ? t('homeTodayHeader') : t('homeNoToday')}
         </div>
         <TodayCard schedule={today} isTomorrow={false} />
 
@@ -429,11 +822,11 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
             <div style={{
               display:"flex", alignItems:"center", gap:8, marginBottom:10
             }}>
-              <div style={{ fontSize:14, fontWeight:600, color:"#555" }}>סידור מחר</div>
+              <div style={{ fontSize:14, fontWeight:600, color:"#555" }}>{t('homeTomorrowHeader')}</div>
               <span style={{
                 fontSize:11, padding:"2px 8px", background:"#FEF3C7",
                 color:"#92400E", borderRadius:6, fontWeight:600
-              }}>חדש</span>
+              }}>{t('homeTomorrowNew')}</span>
             </div>
             <TodayCard schedule={tomorrow} isTomorrow={true} />
           </>
@@ -447,7 +840,7 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
             borderRadius:14, fontSize:14, fontWeight:600,
             color:"#374151", cursor:"pointer"
           }}>
-            📅 היסטוריית משמרות
+            {t('homeBtnHistory')}
           </button>
           <button onClick={onRequests} style={{
             flex:1, padding:"13px 0", position:"relative",
@@ -455,7 +848,7 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
             borderRadius:14, fontSize:14, fontWeight:600,
             color:"#374151", cursor:"pointer"
           }}>
-            📋 הבקשות שלי
+            {t('homeBtnRequests')}
             {pendingCount > 0 && (
               <span style={{
                 position:"absolute", top:-7, left:-4,
@@ -476,7 +869,7 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
           borderRadius:12, fontSize:12, fontWeight:600,
           color:"#9CA3AF", cursor:"pointer"
         }}>
-          👔 מעבר לתצוגת מאשר (דמו — הצד השני של התהליך)
+          {t('homeBtnManager')}
         </button>
 
         {/* Multi-channel note */}
@@ -487,9 +880,8 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
         }}>
           <span style={{ fontSize:18 }}>🚆</span>
           <div style={{ fontSize:11, color:"#075985", lineHeight:1.5 }}>
-            <div style={{ fontWeight:700, marginBottom:2 }}>צ'אט נהלים זמין בטאבלט הקבינה</div>
-            פיצ'רים תפעוליים בזמן הנסיעה נמצאים בטאבלט המותקן בקבינה,
-            בהתאם לנוהל איסור שימוש בפלאפון בתא הנהג
+            <div style={{ fontWeight:700, marginBottom:2 }}>{t('homeCabinChatTitle')}</div>
+            {t('homeCabinChatBody')}
           </div>
         </div>
       </div>
@@ -497,19 +889,19 @@ function HomeScreen({ homeData, pendingCount, onHistory, onRequests, onManager, 
   );
 }
 
-function HistoryScreen({ personalId, driverName, onBack }) {
+function HistoryScreen({ historyData, driverName, onBack }) {
+  const { t } = useT();
   const [schedules, setSchedules] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [expanded, setExpanded] = React.useState(null);
 
   React.useEffect(() => {
-    // מצב הדגמה — נתונים סטטיים במקום fetch ל-API
-    const t = setTimeout(() => {
-      setSchedules(DEMO_HISTORY);
+    const tm = setTimeout(() => {
+      setSchedules(historyData);
       setLoading(false);
     }, 300);
-    return () => clearTimeout(t);
-  }, [personalId]);
+    return () => clearTimeout(tm);
+  }, [historyData]);
 
   return (
     <div style={{ flex:1, display:"flex", flexDirection:"column" }}>
@@ -521,17 +913,17 @@ function HistoryScreen({ personalId, driverName, onBack }) {
           background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#1E40AF"
         }}>←</button>
         <div>
-          <div style={{ fontSize:17, fontWeight:700, color:"#1a1a1a" }}>היסטוריית משמרות</div>
+          <div style={{ fontSize:17, fontWeight:700, color:"#1a1a1a" }}>{t('historyTitle')}</div>
           <div style={{ fontSize:12, color:"#888" }}>{driverName}</div>
         </div>
       </div>
 
       <div style={{ flex:1, overflowY:"auto", padding:"14px 16px" }}>
-        {loading && <div style={{ textAlign:"center", padding:40, color:"#9CA3AF" }}>טוען...</div>}
+        {loading && <div style={{ textAlign:"center", padding:40, color:"#9CA3AF" }}>{t('historyLoading')}</div>}
         {!loading && schedules && schedules.length === 0 && (
           <div style={{ textAlign:"center", padding:40, color:"#9CA3AF" }}>
             <div style={{ fontSize:32, marginBottom:8 }}>📭</div>
-            אין היסטוריה להציג
+            {t('historyEmpty')}
           </div>
         )}
         {!loading && schedules && schedules.map((s, i) => (
@@ -547,9 +939,10 @@ function HistoryScreen({ personalId, driverName, onBack }) {
   );
 }
 
-// ─── Requests: הבקשות שלי ────────────────────────────────────────────────────
+/* ─── Requests: my requests ──────────────────────────────────────────────── */
 
 function StatusChip({ status }) {
+  const { t } = useT();
   const s = statusStyle(status);
   return (
     <span style={{
@@ -558,16 +951,17 @@ function StatusChip({ status }) {
       background:s.bg, color:s.color, fontWeight:700, whiteSpace:"nowrap"
     }}>
       <span style={{ width:7, height:7, borderRadius:4, background:s.dot }} />
-      {status}
+      {t('status_' + status)}
     </span>
   );
 }
 
 function RequestCard({ req, isOpen, onClick }) {
+  const { t } = useT();
   const sameDay = req.startDate === req.endDate;
   const range = sameDay
-    ? hebrewDate(req.startDate)
-    : `${hebrewDate(req.startDate)} — ${hebrewDate(req.endDate)}`;
+    ? formatDate(req.startDate, t)
+    : `${formatDate(req.startDate, t)} — ${formatDate(req.endDate, t)}`;
   const days = daysBetween(req.startDate, req.endDate) + 1;
 
   return (
@@ -577,9 +971,9 @@ function RequestCard({ req, isOpen, onClick }) {
     }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div>
-          <div style={{ fontWeight:700, fontSize:14, color:"#1a1a1a" }}>{req.type}</div>
+          <div style={{ fontWeight:700, fontSize:14, color:"#1a1a1a" }}>{t('reqType_' + req.type)}</div>
           <div style={{ color:"#555", fontSize:13, marginTop:2 }}>
-            {range}{!sameDay && ` (${days} ימים)`}
+            {range}{!sameDay && ` (${days} ${t('requestDaysSuffix')})`}
           </div>
         </div>
         <StatusChip status={req.status} />
@@ -587,21 +981,21 @@ function RequestCard({ req, isOpen, onClick }) {
 
       {isOpen && (
         <div style={{ marginTop:10, padding:"10px 12px", background:"#F9FAFB", borderRadius:10, border:"1px solid #E5E7EB", fontSize:13, color:"#444" }}>
-          <div>🗓️ הוגשה ב-{hebrewDate(req.createdAt)}</div>
-          {req.notes && <div style={{ marginTop:4 }}>📝 {req.notes}</div>}
+          <div>🗓️ {t('requestSubmitted')} {formatDate(req.createdAt, t)}</div>
+          {req.notes && <div style={{ marginTop:4 }}>{t('notesPrefix')} {req.notes}</div>}
           {req.approver && <div style={{ marginTop:4 }}>👤 {req.approver}</div>}
           {req.decisionNote && (
             <div style={{
               marginTop:6, padding:"8px 10px", borderRadius:8, fontSize:12,
-              background: req.status === "נדחתה" ? "#FEF2F2" : "#F0FDF4",
-              color: req.status === "נדחתה" ? "#991B1B" : "#166534",
+              background: req.status === "rejected" ? "#FEF2F2" : "#F0FDF4",
+              color: req.status === "rejected" ? "#991B1B" : "#166534",
             }}>
               {req.decisionNote}
             </div>
           )}
-          {req.status === "ממתינה" && (
+          {req.status === "pending" && (
             <div style={{ marginTop:6, fontSize:12, color:"#92400E" }}>
-              ⏳ הבקשה ממתינה לאישור מנהל היחידה
+              {t('requestPendingNote')}
             </div>
           )}
         </div>
@@ -611,8 +1005,9 @@ function RequestCard({ req, isOpen, onClick }) {
 }
 
 function RequestsScreen({ requests, driverName, onBack, onNewRequest }) {
+  const { t } = useT();
   const [expanded, setExpanded] = React.useState(null);
-  const pending = requests.filter(r => r.status === "ממתינה").length;
+  const pending = requests.filter(r => r.status === "pending").length;
 
   return (
     <div style={{ flex:1, display:"flex", flexDirection:"column" }}>
@@ -624,9 +1019,9 @@ function RequestsScreen({ requests, driverName, onBack, onNewRequest }) {
           background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#1E40AF"
         }}>←</button>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:17, fontWeight:700, color:"#1a1a1a" }}>הבקשות שלי</div>
+          <div style={{ fontSize:17, fontWeight:700, color:"#1a1a1a" }}>{t('requestsTitle')}</div>
           <div style={{ fontSize:12, color:"#888" }}>
-            {driverName}{pending > 0 ? ` · ${pending} ממתינות לאישור` : ""}
+            {driverName}{pending > 0 ? ` · ${pending} ${t('requestsPendingSuffix')}` : ""}
           </div>
         </div>
       </div>
@@ -637,17 +1032,17 @@ function RequestsScreen({ requests, driverName, onBack, onNewRequest }) {
           background:"#1E40AF", color:"#fff", border:"none",
           borderRadius:14, fontSize:15, fontWeight:700, cursor:"pointer"
         }}>
-          + בקשת חופשה / היעדרות חדשה
+          {t('requestsNewBtn')}
         </button>
 
         {requests.length === 0 && (
           <div style={{ textAlign:"center", padding:40, color:"#9CA3AF" }}>
             <div style={{ fontSize:32, marginBottom:8 }}>📭</div>
-            אין בקשות עדיין — הגישו בקשה ראשונה למעלה
+            {t('requestsEmpty')}
           </div>
         )}
 
-        {requests.map((r, i) => (
+        {requests.map((r) => (
           <RequestCard
             key={r.id}
             req={r}
@@ -660,10 +1055,11 @@ function RequestsScreen({ requests, driverName, onBack, onNewRequest }) {
   );
 }
 
-// ─── Requests: בקשה חדשה ─────────────────────────────────────────────────────
+/* ─── Requests: new request ─────────────────────────────────────────────── */
 
 function NewRequestScreen({ onBack, onSubmit }) {
-  const [type, setType] = React.useState("חופשה שנתית");
+  const { t } = useT();
+  const [type, setType] = React.useState("annualLeave");
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
   const [notes, setNotes] = React.useState("");
@@ -672,23 +1068,22 @@ function NewRequestScreen({ onBack, onSubmit }) {
 
   const rule = REQUEST_RULES[type];
 
-  // ולידציה לפי הכללים העסקיים מה-BRD
   function validate() {
     const errs = [];
-    if (!startDate) errs.push("חסר תאריך התחלה");
-    if (!endDate && type !== "יום אישי") errs.push("חסר תאריך סיום");
+    if (!startDate) errs.push(t('errMissingStart'));
+    if (!endDate && type !== "personalDay") errs.push(t('errMissingEnd'));
 
-    const effectiveEnd = type === "יום אישי" ? startDate : endDate;
+    const effectiveEnd = type === "personalDay" ? startDate : endDate;
 
     if (startDate && daysBetween(DEMO_TODAY, startDate) < 0)
-      errs.push("תאריך ההתחלה כבר עבר — לא ניתן להגיש בקשה רטרואקטיבית");
+      errs.push(t('errPastStart'));
 
     if (startDate && effectiveEnd && daysBetween(startDate, effectiveEnd) < 0)
-      errs.push("תאריך הסיום מוקדם מתאריך ההתחלה");
+      errs.push(t('errEndBeforeStart'));
 
     if (startDate && daysBetween(DEMO_TODAY, startDate) >= 0 &&
         daysBetween(DEMO_TODAY, startDate) < rule.minNoticeDays)
-      errs.push(`${type} מחייבת הגשה לפחות ${rule.minNoticeDays} ימים מראש`);
+      errs.push(t('errNoticeTpl')(t('reqType_' + type), rule.minNoticeDays));
 
     return errs;
   }
@@ -699,7 +1094,7 @@ function NewRequestScreen({ onBack, onSubmit }) {
     if (errs.length > 0) return;
     onSubmit({
       type, startDate,
-      endDate: type === "יום אישי" ? startDate : endDate,
+      endDate: type === "personalDay" ? startDate : endDate,
       notes,
     });
     setSubmitted(true);
@@ -716,15 +1111,14 @@ function NewRequestScreen({ onBack, onSubmit }) {
     return (
       <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:32, textAlign:"center" }}>
         <div style={{ fontSize:48, marginBottom:14 }}>✅</div>
-        <div style={{ fontSize:19, fontWeight:800, color:"#1a1a1a", marginBottom:6 }}>הבקשה נשלחה</div>
-        <div style={{ fontSize:13, color:"#666", marginBottom:24, lineHeight:1.6 }}>
-          הבקשה נקלטה במערכת בסטטוס "ממתינה"<br/>ותועבר לאישור מנהל היחידה
-        </div>
+        <div style={{ fontSize:19, fontWeight:800, color:"#1a1a1a", marginBottom:6 }}>{t('nrSuccessTitle')}</div>
+        <div style={{ fontSize:13, color:"#666", marginBottom:24, lineHeight:1.6 }}
+             dangerouslySetInnerHTML={{ __html: t('nrSuccessBody') }} />
         <button onClick={onBack} style={{
           padding:"12px 28px", background:"#1E40AF", color:"#fff",
           border:"none", borderRadius:12, fontSize:15, fontWeight:700, cursor:"pointer"
         }}>
-          חזרה לבקשות שלי
+          {t('nrBackToRequests')}
         </button>
       </div>
     );
@@ -739,37 +1133,37 @@ function NewRequestScreen({ onBack, onSubmit }) {
         <button onClick={onBack} style={{
           background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#1E40AF"
         }}>←</button>
-        <div style={{ fontSize:17, fontWeight:700, color:"#1a1a1a" }}>בקשה חדשה</div>
+        <div style={{ fontSize:17, fontWeight:700, color:"#1a1a1a" }}>{t('newRequestTitle')}</div>
       </div>
 
       <div style={{ flex:1, overflowY:"auto", padding:"16px" }}>
-        <label style={labelStyle}>סוג הבקשה</label>
+        <label style={labelStyle}>{t('nrType')}</label>
         <select value={type} onChange={e => { setType(e.target.value); setErrors([]); }} style={inputStyle}>
-          {Object.keys(REQUEST_RULES).map(t => <option key={t} value={t}>{t}</option>)}
+          {Object.keys(REQUEST_RULES).map(k => <option key={k} value={k}>{t('reqType_' + k)}</option>)}
         </select>
 
         <div style={{
           padding:"8px 12px", background:"#EFF6FF", borderRadius:10,
           fontSize:12, color:"#1E40AF", marginBottom:14, marginTop:-6
         }}>
-          ℹ️ {rule.label}
+          ℹ️ {t('reqRule_' + type)}
         </div>
 
-        <label style={labelStyle}>{type === "יום אישי" ? "תאריך" : "מתאריך"}</label>
+        <label style={labelStyle}>{type === "personalDay" ? t('nrDate') : t('nrFromDate')}</label>
         <input type="date" value={startDate} min={DEMO_TODAY}
           onChange={e => setStartDate(e.target.value)} style={inputStyle} />
 
-        {type !== "יום אישי" && (
+        {type !== "personalDay" && (
           <>
-            <label style={labelStyle}>עד תאריך</label>
+            <label style={labelStyle}>{t('nrToDate')}</label>
             <input type="date" value={endDate} min={startDate || DEMO_TODAY}
               onChange={e => setEndDate(e.target.value)} style={inputStyle} />
           </>
         )}
 
-        <label style={labelStyle}>הערות (לא חובה)</label>
+        <label style={labelStyle}>{t('nrNotes')}</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)}
-          placeholder="לדוגמה: אירוע משפחתי"
+          placeholder={t('nrNotesPlaceholder')}
           rows={3}
           style={{ ...inputStyle, resize:"none", fontFamily:"inherit" }} />
 
@@ -791,31 +1185,32 @@ function NewRequestScreen({ onBack, onSubmit }) {
           background:"#1E40AF", color:"#fff", border:"none", borderRadius:14,
           fontSize:16, fontWeight:700, cursor:"pointer"
         }}>
-          שליחת הבקשה לאישור
+          {t('nrSubmit')}
         </button>
         <div style={{ fontSize:11, color:"#9CA3AF", textAlign:"center", marginTop:10 }}>
-          הבקשה תועבר לאישור מנהל יחידת הנהגים
+          {t('nrFooter')}
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Requests: תצוגת מאשר (הצד השני של התהליך) ──────────────────────────────
+/* ─── Requests: manager view (the other side of the process) ───────────── */
 
 function ManagerScreen({ requests, driverName, onBack, onDecide }) {
+  const { t } = useT();
   const [rejectingId, setRejectingId] = React.useState(null);
   const [rejectReason, setRejectReason] = React.useState("");
 
-  const pending = requests.filter(r => r.status === "ממתינה");
-  const decided = requests.filter(r => r.status !== "ממתינה");
+  const pending = requests.filter(r => r.status === "pending");
+  const decided = requests.filter(r => r.status !== "pending");
 
   function approve(id) {
-    onDecide(id, "אושרה", "אושר. שובץ נהג מחליף.");
+    onDecide(id, "approved", t('mgrApproveDecision'));
   }
   function reject(id) {
-    if (!rejectReason.trim()) return; // כלל עסקי: דחייה מחייבת נימוק
-    onDecide(id, "נדחתה", rejectReason.trim());
+    if (!rejectReason.trim()) return;
+    onDecide(id, "rejected", rejectReason.trim());
     setRejectingId(null);
     setRejectReason("");
   }
@@ -830,19 +1225,19 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
           background:"none", border:"none", fontSize:22, cursor:"pointer", color:"#fff"
         }}>←</button>
         <div style={{ flex:1 }}>
-          <div style={{ fontSize:17, fontWeight:700 }}>אישור בקשות — מנהל יחידה</div>
-          <div style={{ fontSize:12, opacity:0.7 }}>תצוגת דמו של צד המאשר בתהליך</div>
+          <div style={{ fontSize:17, fontWeight:700 }}>{t('mgrTitle')}</div>
+          <div style={{ fontSize:12, opacity:0.7 }}>{t('mgrSub')}</div>
         </div>
       </div>
 
       <div style={{ flex:1, overflowY:"auto", padding:"14px 16px" }}>
         <div style={{ fontSize:13, fontWeight:700, color:"#555", marginBottom:10 }}>
-          ממתינות להחלטה ({pending.length})
+          {t('mgrPending')} ({pending.length})
         </div>
 
         {pending.length === 0 && (
           <div style={{ textAlign:"center", padding:24, color:"#9CA3AF", fontSize:13 }}>
-            אין בקשות ממתינות 🎉
+            {t('mgrEmpty')}
           </div>
         )}
 
@@ -853,11 +1248,11 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
           }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
-                <div style={{ fontWeight:700, fontSize:14, color:"#1a1a1a" }}>{r.type} — {driverName}</div>
+                <div style={{ fontWeight:700, fontSize:14, color:"#1a1a1a" }}>{t('reqType_' + r.type)} — {driverName}</div>
                 <div style={{ color:"#555", fontSize:13, marginTop:2 }}>
-                  {hebrewDate(r.startDate)}{r.endDate !== r.startDate && ` — ${hebrewDate(r.endDate)}`}
+                  {formatDate(r.startDate, t)}{r.endDate !== r.startDate && ` — ${formatDate(r.endDate, t)}`}
                 </div>
-                {r.notes && <div style={{ color:"#888", fontSize:12, marginTop:2 }}>📝 {r.notes}</div>}
+                {r.notes && <div style={{ color:"#888", fontSize:12, marginTop:2 }}>{t('notesPrefix')} {r.notes}</div>}
               </div>
               <StatusChip status={r.status} />
             </div>
@@ -867,7 +1262,7 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
                 <input
                   value={rejectReason}
                   onChange={e => setRejectReason(e.target.value)}
-                  placeholder="נימוק לדחייה (חובה)"
+                  placeholder={t('mgrRejectPlaceholder')}
                   style={{
                     width:"100%", padding:"10px 12px", borderRadius:10,
                     border:"2px solid #FECACA", fontSize:13, outline:"none", marginBottom:8
@@ -879,11 +1274,11 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
                     background: rejectReason.trim() ? "#DC2626" : "#FCA5A5",
                     color:"#fff", fontWeight:700, fontSize:13,
                     cursor: rejectReason.trim() ? "pointer" : "default"
-                  }}>אישור הדחייה</button>
+                  }}>{t('mgrConfirmReject')}</button>
                   <button onClick={() => { setRejectingId(null); setRejectReason(""); }} style={{
                     padding:"10px 14px", borderRadius:10, border:"1px solid #E5E7EB",
                     background:"#fff", color:"#555", fontSize:13, cursor:"pointer"
-                  }}>ביטול</button>
+                  }}>{t('mgrCancel')}</button>
                 </div>
               </div>
             ) : (
@@ -891,11 +1286,11 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
                 <button onClick={() => approve(r.id)} style={{
                   flex:1, padding:"10px 0", borderRadius:10, border:"none",
                   background:"#16A34A", color:"#fff", fontWeight:700, fontSize:13, cursor:"pointer"
-                }}>✓ אישור</button>
+                }}>{t('mgrApproveBtn')}</button>
                 <button onClick={() => setRejectingId(r.id)} style={{
                   flex:1, padding:"10px 0", borderRadius:10, border:"1px solid #FECACA",
                   background:"#FEF2F2", color:"#DC2626", fontWeight:700, fontSize:13, cursor:"pointer"
-                }}>✗ דחייה</button>
+                }}>{t('mgrRejectBtn')}</button>
               </div>
             )}
           </div>
@@ -904,7 +1299,7 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
         {decided.length > 0 && (
           <>
             <div style={{ fontSize:13, fontWeight:700, color:"#555", margin:"16px 0 10px" }}>
-              הוחלטו לאחרונה
+              {t('mgrDecided')}
             </div>
             {decided.map(r => (
               <div key={r.id} style={{
@@ -913,7 +1308,7 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
                 justifyContent:"space-between", alignItems:"center", opacity:0.75
               }}>
                 <div style={{ fontSize:13, color:"#444" }}>
-                  {r.type} · {hebrewDate(r.startDate)}
+                  {t('reqType_' + r.type)} · {formatDate(r.startDate, t)}
                 </div>
                 <StatusChip status={r.status} />
               </div>
@@ -925,15 +1320,17 @@ function ManagerScreen({ requests, driverName, onBack, onDecide }) {
   );
 }
 
-// ─── Chat: צ'אט נהלים (Phase 2 — Beta) ───────────────────────────────────────
+/* ─── Chat: procedures chat (Phase 2 — Beta) ───────────────────────────── */
 
 function SuggestedQuestion({ text, onClick }) {
+  const { lang } = useT();
   return (
     <button onClick={onClick} style={{
-      textAlign:"right", padding:"10px 14px", marginBottom:8,
+      textAlign: lang === 'he' ? "right" : "left",
+      padding:"10px 14px", marginBottom:8,
       background:"#fff", border:"1px solid #E5E7EB", borderRadius:12,
       color:"#1E40AF", fontSize:13, fontWeight:600,
-      cursor:"pointer", width:"100%", direction:"rtl"
+      cursor:"pointer", width:"100%"
     }}>
       💬 {text}
     </button>
@@ -976,11 +1373,11 @@ function ChatBubble({ msg }) {
         )}
         {msg.tags && (
           <div style={{ display:"flex", gap:4, marginTop:6, flexWrap:"wrap" }}>
-            {msg.tags.map((t,i) => (
+            {msg.tags.map((tg,i) => (
               <span key={i} style={{
                 fontSize:10, padding:"2px 7px", borderRadius:6,
                 background:"#EFF6FF", color:"#1E40AF", fontWeight:600
-              }}>#{t}</span>
+              }}>#{tg}</span>
             ))}
           </div>
         )}
@@ -989,7 +1386,8 @@ function ChatBubble({ msg }) {
   );
 }
 
-function ChatScreen({ compact, onBack }) {
+function ChatScreen({ onBack }) {
+  const { t, lang } = useT();
   const [messages, setMessages] = React.useState([]);
   const [input, setInput] = React.useState("");
   const [thinking, setThinking] = React.useState(false);
@@ -1007,11 +1405,10 @@ function ChatScreen({ compact, onBack }) {
     setThinking(true);
 
     setTimeout(() => {
-      const answer = findChatAnswer(q);
+      const answer = findChatAnswer(q, lang);
       const reply = answer
         ? { role:"assistant", text:answer.answer, source:answer.source, tags:answer.tags }
-        : { role:"assistant", fallback:true,
-            text:"לא נמצאה תשובה ישירה במאגר הנהלים בדמו זה.\n\nבמערכת ייצור — שליפת RAG מעל מאגר הנהלים הרשמי של הארגון, עם ציטוט מקור לכל תשובה.\n\nנסה אחת מהשאלות המוצעות למטה ↓" };
+        : { role:"assistant", fallback:true, text: t('chatNoAnswer') };
       setMessages(prev => [...prev, reply]);
       setThinking(false);
     }, 600);
@@ -1031,14 +1428,14 @@ function ChatScreen({ compact, onBack }) {
         )}
         <div style={{ flex:1 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <div style={{ fontSize:16, fontWeight:700, color:"#1a1a1a" }}>צ'אט נהלים</div>
+            <div style={{ fontSize:16, fontWeight:700, color:"#1a1a1a" }}>{t('chatTitle')}</div>
             <span style={{
               fontSize:10, padding:"2px 7px", background:"#FEF3C7",
               color:"#92400E", borderRadius:6, fontWeight:700
-            }}>Phase 2 · Beta</span>
+            }}>{t('chatPhase')}</span>
           </div>
           <div style={{ fontSize:11, color:"#9CA3AF", marginTop:2 }}>
-            מבוסס על מאגר הנהלים הרשמי
+            {t('chatBasedOn')}
           </div>
         </div>
       </div>
@@ -1049,7 +1446,7 @@ function ChatScreen({ compact, onBack }) {
         padding:"8px 16px", fontSize:11, color:"#92400E",
         display:"flex", alignItems:"center", gap:6
       }}>
-        ⚠️ מידע לעיון בלבד · אינו מחליף את הנוהל הרשמי או הוראות מוקד תנועה
+        {t('chatDisclaimer')}
       </div>
 
       {/* Messages */}
@@ -1059,16 +1456,16 @@ function ChatScreen({ compact, onBack }) {
             <div style={{ textAlign:"center", padding:"20px 0 24px" }}>
               <div style={{ fontSize:36, marginBottom:8 }}>🚆</div>
               <div style={{ fontSize:15, fontWeight:700, color:"#1a1a1a", marginBottom:4 }}>
-                שלום, איך אפשר לעזור?
+                {t('chatGreet')}
               </div>
               <div style={{ fontSize:12, color:"#6B7280" }}>
-                שאל שאלה על נהלים, מהירויות מותרות, או התנהלות בתקלה
+                {t('chatGreetSub')}
               </div>
             </div>
             <div style={{ fontSize:11, fontWeight:700, color:"#6B7280", marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>
-              שאלות מוצעות
+              {t('chatSuggestedTitle')}
             </div>
-            {CHAT_SUGGESTED.map((q, i) => (
+            {(CHAT_SUGGESTED[lang] || CHAT_SUGGESTED.en).map((q, i) => (
               <SuggestedQuestion key={i} text={q} onClick={() => send(q)} />
             ))}
           </div>
@@ -1101,7 +1498,7 @@ function ChatScreen({ compact, onBack }) {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter") send(); }}
-          placeholder="כתוב שאלה..."
+          placeholder={t('chatPlaceholder')}
           style={{
             flex:1, padding:"11px 14px", borderRadius:12,
             border:"1px solid #E5E7EB", fontSize:14, outline:"none",
@@ -1113,14 +1510,16 @@ function ChatScreen({ compact, onBack }) {
           color:"#fff", border:"none", borderRadius:12, fontSize:14, fontWeight:700,
           cursor: input.trim() && !thinking ? "pointer" : "default"
         }}>
-          שלח
+          {t('chatSend')}
         </button>
       </div>
     </div>
   );
 }
 
-// ─── App ──────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+ * App shell — device toggle + language toggle
+ * ═══════════════════════════════════════════════════════════════════════════ */
 
 function PhoneFrame({ children }) {
   return (
@@ -1146,6 +1545,7 @@ function PhoneFrame({ children }) {
 }
 
 function TabletFrame({ children, driverName, currentShift }) {
+  const { t } = useT();
   return (
     <div style={{
       width:"100%", maxWidth:720, minHeight:520,
@@ -1164,9 +1564,9 @@ function TabletFrame({ children, driverName, currentShift }) {
       }}>
         <span style={{ display:"flex", alignItems:"center", gap:6 }}>
           <span style={{ width:7, height:7, borderRadius:4, background:"#10B981" }} />
-          טאבלט קבינה · נהג: {driverName || "—"} {currentShift && `· משמרת #${currentShift}`}
+          {t('tabletStripLabel')} · {t('tabletDriver')}: {driverName || "—"} {currentShift != null && `· ${t('tabletShift')} #${currentShift}`}
         </span>
-        <span style={{ fontFamily:"monospace" }}>14:23 · נוסע</span>
+        <span style={{ fontFamily:"monospace" }}>14:23 · {t('tabletPassenger')}</span>
       </div>
       {/* Inner working area */}
       <div style={{
@@ -1180,9 +1580,10 @@ function TabletFrame({ children, driverName, currentShift }) {
 }
 
 function DeviceToggle({ device, onChange }) {
+  const { t } = useT();
   const opts = [
-    { id:"phone",  label:"📱 פלאפון נהג", sub:"לפני / אחרי משמרת" },
-    { id:"tablet", label:"🚆 טאבלט קבינה", sub:"בזמן נסיעה" }
+    { id:"phone",  label: t('devicePhone'),  sub: t('devicePhoneSub') },
+    { id:"tablet", label: t('deviceTablet'), sub: t('deviceTabletSub') }
   ];
   return (
     <div style={{
@@ -1211,27 +1612,87 @@ function DeviceToggle({ device, onChange }) {
         ))}
       </div>
       <div style={{ fontSize:11, color:"#9CA3AF", textAlign:"center", maxWidth:520 }}>
-        מודל רב-ערוצי לפי נוהל — בזמן נסיעה הפלאפון אינו בשימוש; פיצ'רים תפעוליים זמינים בטאבלט הקבינה
+        {t('deviceChannelNote')}
       </div>
     </div>
   );
 }
 
-function PhoneApp() {
+function LangToggle({ lang, onChange }) {
+  const opts = [
+    { id: 'en', label: 'EN', full: 'English' },
+    { id: 'he', label: 'HE', full: 'עברית' }
+  ];
+  return (
+    <div style={{
+      display:"flex", flexDirection:"column", alignItems:"center",
+      padding:"20px 12px 6px", gap:6
+    }}>
+      <div style={{
+        display:"inline-flex", background:"#fff", borderRadius:14,
+        padding:4, border:"1px solid #E5E7EB",
+        boxShadow:"0 2px 8px rgba(15, 23, 42, 0.06)"
+      }}>
+        {opts.map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => onChange(opt.id)}
+            aria-pressed={lang === opt.id}
+            style={{
+              padding:"10px 22px", border:"none", borderRadius:10, cursor:"pointer",
+              background: lang===opt.id ? "#0F172A" : "transparent",
+              color: lang===opt.id ? "#fff" : "#374151",
+              fontWeight:800, fontSize:14, transition:"all 0.15s",
+              fontFamily:"'JetBrains Mono', monospace", letterSpacing:"0.1em",
+              minWidth:64
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      <div style={{ fontSize:10, color:"#9CA3AF", letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600 }}>
+        Language · שפה
+      </div>
+    </div>
+  );
+}
+
+function PhoneApp({ data }) {
   const [screen, setScreen] = React.useState("login");
   const [homeData, setHomeData] = React.useState(null);
-  const [requests, setRequests] = React.useState(DEMO_REQUESTS);
+  const [requests, setRequests] = React.useState(data.requests);
 
-  const pendingCount = requests.filter(r => r.status === "ממתינה").length;
+  /* When language switches, swap demo home + history but keep request state */
+  React.useEffect(() => {
+    setRequests(prev => {
+      // Re-translate request notes/decisionNotes if they were the originals
+      return prev.map(r => {
+        const origMatch = data.requests.find(o => o.id === r.id);
+        if (origMatch) {
+          return {
+            ...r,
+            notes: r.notes === origMatch.notes ? origMatch.notes : r.notes,
+            decisionNote: r.decisionNote === origMatch.decisionNote ? origMatch.decisionNote : r.decisionNote,
+            approver: r.approver === origMatch.approver ? origMatch.approver : r.approver
+          };
+        }
+        return r;
+      });
+    });
+  }, [data]);
 
-  function handleLogin(data) { setHomeData(data); setScreen("home"); }
+  const pendingCount = requests.filter(r => r.status === "pending").length;
+  const { t } = useT();
+
+  function handleLogin(d) { setHomeData(d); setScreen("home"); }
   function handleLogout() { setHomeData(null); setScreen("login"); }
 
   function handleNewRequest(req) {
     setRequests(prev => [{
       ...req,
       id: Math.max(0, ...prev.map(r => r.id)) + 1,
-      status: "ממתינה", createdAt: DEMO_TODAY,
+      status: "pending", createdAt: DEMO_TODAY,
       approver: null, decisionNote: null,
     }, ...prev]);
   }
@@ -1239,17 +1700,17 @@ function PhoneApp() {
   function handleDecide(id, status, decisionNote) {
     setRequests(prev => prev.map(r =>
       r.id === id
-        ? { ...r, status, decisionNote, approver: "מנהל יחידת נהגים — מ. לוי" }
+        ? { ...r, status, decisionNote, approver: t('mgrManagerName') }
         : r
     ));
   }
 
   return (
     <PhoneFrame>
-      {screen === "login" && <LoginScreen onLogin={handleLogin} />}
+      {screen === "login" && <LoginScreen onLogin={handleLogin} defaultHome={data.home} />}
       {screen === "home" && homeData && (
         <HomeScreen
-          homeData={homeData}
+          homeData={data.home}
           pendingCount={pendingCount}
           onHistory={() => setScreen("history")}
           onRequests={() => setScreen("requests")}
@@ -1259,15 +1720,15 @@ function PhoneApp() {
       )}
       {screen === "history" && homeData && (
         <HistoryScreen
-          personalId={homeData.driver.personal_id}
-          driverName={homeData.driver.name}
+          historyData={data.history}
+          driverName={data.home.driver.name}
           onBack={() => setScreen("home")}
         />
       )}
       {screen === "requests" && homeData && (
         <RequestsScreen
           requests={requests}
-          driverName={homeData.driver.name}
+          driverName={data.home.driver.name}
           onBack={() => setScreen("home")}
           onNewRequest={() => setScreen("newRequest")}
         />
@@ -1281,7 +1742,7 @@ function PhoneApp() {
       {screen === "manager" && homeData && (
         <ManagerScreen
           requests={requests}
-          driverName={homeData.driver.name}
+          driverName={data.home.driver.name}
           onBack={() => setScreen("home")}
           onDecide={handleDecide}
         />
@@ -1290,53 +1751,84 @@ function PhoneApp() {
   );
 }
 
-function TabletApp() {
-  // בטאבלט אין login — הוא מותקן בקבינה ומזוהה לפי הנהג המשובץ למשמרת הנוכחית
-  const driver = DEMO_HOME.driver;
-  const shift = DEMO_HOME.today;
+function TabletApp({ data }) {
+  const driver = data.home.driver;
+  const shift = data.home.today;
 
   return (
     <TabletFrame driverName={driver.name} currentShift={shift && shift.num}>
-      {shift && (
-        <div style={{
-          padding:"10px 16px", background:"#fff",
-          borderBottom:"1px solid #E5E7EB",
-          display:"flex", alignItems:"center", justifyContent:"space-between",
-          flexShrink:0
-        }}>
-          <div style={{ fontSize:13, color:"#374151" }}>
-            <span style={{ fontWeight:700 }}>משמרת פעילה</span>
-            <span style={{ color:"#9CA3AF" }}> · {shift.start}–{shift.end} · </span>
-            <span>{shift.stationStart} → {shift.stationEnd}</span>
-          </div>
-          <div style={{ display:"flex", gap:4, direction:"ltr" }}>
-            {(shift.trains || []).slice(0,3).map((t,i) => (
-              <span key={i} style={{
-                fontSize:11, fontWeight:700, padding:"2px 8px",
-                background:"#EFF6FF", color:"#1E40AF", borderRadius:6,
-                fontFamily:"monospace"
-              }}>{t}</span>
-            ))}
-          </div>
-        </div>
-      )}
+      {shift && <ActiveShiftStrip shift={shift} />}
       <ChatScreen />
     </TabletFrame>
   );
 }
 
-function App() {
-  const [device, setDevice] = React.useState("phone");
+function ActiveShiftStrip({ shift }) {
+  const { t } = useT();
   return (
-    <>
-      <DeviceToggle device={device} onChange={setDevice} />
-      <div style={{
-        display:"flex", justifyContent:"center",
-        padding:"12px 16px 24px", alignItems:"flex-start"
-      }}>
-        {device === "phone" ? <PhoneApp /> : <TabletApp />}
+    <div style={{
+      padding:"10px 16px", background:"#fff",
+      borderBottom:"1px solid #E5E7EB",
+      display:"flex", alignItems:"center", justifyContent:"space-between",
+      flexShrink:0
+    }}>
+      <div style={{ fontSize:13, color:"#374151" }}>
+        <span style={{ fontWeight:700 }}>{t('tabletActiveShift')}</span>
+        <span style={{ color:"#9CA3AF" }}> · {shift.start}–{shift.end} · </span>
+        <span>{shift.stationStart} → {shift.stationEnd}</span>
       </div>
-    </>
+      <div style={{ display:"flex", gap:4, direction:"ltr" }}>
+        {(shift.trains || []).slice(0,3).map((tr,i) => (
+          <span key={i} style={{
+            fontSize:11, fontWeight:700, padding:"2px 8px",
+            background:"#EFF6FF", color:"#1E40AF", borderRadius:6,
+            fontFamily:"monospace"
+          }}>{tr}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [lang, setLang] = React.useState(() => {
+    try {
+      const stored = localStorage.getItem('siteLang');
+      if (stored === 'he' || stored === 'en') return stored;
+    } catch (e) {}
+    return 'en';
+  });
+  const [device, setDevice] = React.useState("phone");
+
+  React.useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'he' ? 'rtl' : 'ltr';
+    try { localStorage.setItem('siteLang', lang); } catch (e) {}
+  }, [lang]);
+
+  const ctx = React.useMemo(() => ({
+    lang,
+    t: (k) => {
+      const v = I18N[lang][k];
+      return v !== undefined ? v : k;
+    }
+  }), [lang]);
+
+  const data = DEMO_DATA[lang];
+
+  return (
+    <LangContext.Provider value={ctx}>
+      <div style={{ position:"relative", minHeight:"100vh" }}>
+        <LangToggle lang={lang} onChange={setLang} />
+        <DeviceToggle device={device} onChange={setDevice} />
+        <div style={{
+          display:"flex", justifyContent:"center",
+          padding:"12px 16px 24px", alignItems:"flex-start"
+        }}>
+          {device === "phone" ? <PhoneApp data={data} /> : <TabletApp data={data} />}
+        </div>
+      </div>
+    </LangContext.Provider>
   );
 }
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>API · מפרט אינטגרציות — Driver Portal</title>
-<meta name="description" content="5 אינטגרציות עם מערכות מקור: scheduling, dispatch, HR, push, IDP — דף הסבר ל-Integration Spec." />
+<title>API · Integration Specification — Driver Portal</title>
+<meta name="description" content="5 integrations with source systems: scheduling, dispatch, HR, push, IDP — the Integration Spec explainer." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -21,8 +21,23 @@ a:hover { text-decoration: underline; }
 .narrow { max-width: 760px; }
 .mast { border-bottom: 1px solid var(--rule-dim); padding: 18px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
 .mast-inner { display: flex; justify-content: space-between; align-items: center; }
+.mast-actions { display: flex; align-items: center; gap: 14px; }
 .back { color: var(--accent); }
 .back:hover { text-decoration: underline; }
+.lang-toggle {
+  background: rgba(20, 33, 61, 0.06);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.lang-toggle:hover { background: var(--ink); color: #fff; transform: translateY(-1px); }
 .hero { padding: 64px 0 40px; border-bottom: 1px solid var(--rule); }
 .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 500; }
 .h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: clamp(32px, 5vw, 52px); line-height: 1.1; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 20px; }
@@ -79,6 +94,10 @@ p strong { color: var(--ink); font-weight: 600; }
 }
 .fallback strong { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--accent); }
 
+/* Direction-aware overrides for LTR */
+[dir="ltr"] .fallback { border-right: none; border-left: 3px solid var(--accent); }
+[dir="ltr"] table th, [dir="ltr"] table td { text-align: left !important; }
+
 footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
 </style>
 </head>
@@ -86,95 +105,98 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
 
 <div class="mast">
   <div class="container mast-inner">
-    <span><a class="back" href="index.html">← חזרה ל-Case Study</a></span>
-    <span>04 · API</span>
+    <span><a class="back" href="index.html" data-i18n="backLink">← Back to Case Study</a></span>
+    <div class="mast-actions">
+      <button class="lang-toggle" id="langToggle" aria-label="Switch language">HE</button>
+      <span data-i18n="pageId">API</span>
+    </div>
   </div>
 </div>
 
 <header class="hero">
   <div class="container narrow">
-    <div class="eyebrow">Artifact 04 · Integration Specification</div>
-    <h1 class="h1">חמש אינטגרציות עם מערכות מקור</h1>
-    <p class="lead">
-      ה-Portal לא מחזיק נתונים משלו — הוא חלון לכמה מערכות שכבר קיימות בארגון. לכל אינטגרציה הוגדרו: סוג חיבור, כיוון נתונים, תדירות, ומסלול fallback אם המערכת המקור לא זמינה. (BRD §5)
+    <div class="eyebrow" data-i18n="eyebrow">Integration Specification</div>
+    <h1 class="h1" data-i18n="heroH1">Five integrations with source systems</h1>
+    <p class="lead" data-i18n="heroLead">
+      The Portal doesn't hold its own data — it's a window into several systems that already exist in the organization. Each integration defines: connection type, data direction, frequency, and a fallback path if the source system isn't available. (BRD §5)
     </p>
   </div>
 </header>
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">חמש האינטגרציות, אחת אחת</h2>
+    <h2 class="h2" data-i18n="s1Title">The five integrations, one by one</h2>
 
     <div class="integration">
       <div class="int-num">INT-01</div>
       <div class="int-name">Scheduling System</div>
-      <div class="int-sub">מערכת סידור עבודה — מקור הסידור היומי</div>
-      <p>שולחת ל-Portal את סידור העבודה בכל פעם שיש שינוי. <strong>זה ה-core data flow</strong> שמזין את כל מסכי ה"היום ומחר" של הנהג.</p>
+      <div class="int-sub" data-i18n="i1Sub">Work scheduling system — source of the daily schedule</div>
+      <p data-i18n-html="i1P">Sends the work schedule to the Portal on every change. <strong>This is the core data flow</strong> that feeds all the driver's "today and tomorrow" screens.</p>
       <dl class="int-grid">
-        <dt>סוג</dt><dd>REST API (JSON) — push on change</dd>
-        <dt>תדירות</dt><dd>אירועי-דחיפה (בכל שינוי) + sync יומי לבדיקת עקביות</dd>
-        <dt>זרימה</dt><dd>Scheduling → Portal: שיוך נהג למשמרת, שינויים, הוספות, ביטולים</dd>
-        <dt>אימות</dt><dd><code>shift_id</code> ייחודי + checksum על כל ה-payload</dd>
+        <dt data-i18n="dtType">Type</dt><dd data-i18n="i1Type">REST API (JSON) — push on change</dd>
+        <dt data-i18n="dtFreq">Frequency</dt><dd data-i18n="i1Freq">Push events (on every change) + daily sync for consistency check</dd>
+        <dt data-i18n="dtFlow">Flow</dt><dd data-i18n="i1Flow">Scheduling → Portal: driver-shift assignments, changes, additions, cancellations</dd>
+        <dt data-i18n="dtAuth">Auth</dt><dd data-i18n-html="i1Auth">Unique <code>shift_id</code> + checksum on the whole payload</dd>
       </dl>
-      <div class="fallback"><strong>Fallback:</strong> אם ה-API לא זמין — ייבוא ידני של Excel ע"י דיספצ'ר, פעם ביום. נשמרת אותה סכמת רשומות.</div>
+      <div class="fallback" data-i18n-html="i1Fallback"><strong>Fallback:</strong> If the API isn't available — manual Excel import by dispatcher, once a day. Same record schema is preserved.</div>
     </div>
 
     <div class="integration">
       <div class="int-num">INT-02</div>
       <div class="int-name">Dispatch Operations</div>
-      <div class="int-sub">מוקד תפעולי — תיאום הסעות (מוניות / רכבי איסוף)</div>
-      <p>שני כיוונים: נהג שולח בקשת איסוף דרך ה-Portal, מוקד מאשר/מקצה רכב, ועדכון סטטוס חוזר ל-Portal עד הגעת הרכב. <strong>ETA למונית בלילה לא יכול לסבול 15 דקות עיכוב</strong> — לכן הארכיטקטורה כאן event-driven מהיסוד.</p>
+      <div class="int-sub" data-i18n="i2Sub">Operations center — ride coordination (taxis / pickup vehicles)</div>
+      <p data-i18n-html="i2P">Two directions: driver sends a pickup request via the Portal, ops approves/assigns a vehicle, and status updates flow back to the Portal until the vehicle arrives. <strong>A taxi ETA at night can't tolerate a 15-minute delay</strong> — so the architecture here is event-driven from the start.</p>
       <dl class="int-grid">
-        <dt>סוג</dt><dd><strong>Webhook (ראשי)</strong> + REST polling כ-fallback בלבד</dd>
-        <dt>תדירות</dt><dd>Webhook על כל שינוי סטטוס (real-time). Polling פעם ב-10 דק' רק לאיתור אירועים שאבדו (network blip, downtime).</dd>
-        <dt>זרימה</dt><dd>Portal → Dispatch: בקשה. Dispatch → Portal (webhook): אישור, רכב, ETA, סטטוס חי בכל שינוי.</dd>
-        <dt>אימות</dt><dd>OAuth2 + driver_id משויך לבקשה; webhook חתום עם HMAC לאימות מקור</dd>
+        <dt data-i18n="dtType2">Type</dt><dd data-i18n-html="i2Type"><strong>Webhook (primary)</strong> + REST polling as fallback only</dd>
+        <dt data-i18n="dtFreq2">Frequency</dt><dd data-i18n="i2Freq">Webhook on every status change (real-time). Polling every 10 min only to catch missed events (network blip, downtime).</dd>
+        <dt data-i18n="dtFlow2">Flow</dt><dd data-i18n="i2Flow">Portal → Dispatch: request. Dispatch → Portal (webhook): approval, vehicle, ETA, live status on every change.</dd>
+        <dt data-i18n="dtAuth2">Auth</dt><dd data-i18n="i2Auth">OAuth2 + driver_id bound to request; webhook signed with HMAC for source verification</dd>
       </dl>
-      <div class="fallback"><strong>Fallback:</strong> אם ה-webhook נופל לאורך זמן (>15 דק' ללא פעימה) — מעבר אוטומטי ל-polling אגרסיבי (פעם בדקה) + פאנל admin ידני במוקד לעדכון סטטוס.</div>
+      <div class="fallback" data-i18n-html="i2Fallback"><strong>Fallback:</strong> If the webhook fails over time (>15 min without a heartbeat) — automatic switch to aggressive polling (once per minute) + manual admin panel in ops for status updates.</div>
     </div>
 
     <div class="integration">
       <div class="int-num">INT-03</div>
       <div class="int-name">HR System of Record</div>
-      <div class="int-sub">מערכת משאבי אנוש — SSO + REST</div>
-      <p>מקור-האמת לכל מה שקשור לנהג כעובד: יתרת חופשה, תלושי שכר, חגים, זכאויות. ה-Portal <strong>לא מחזיק עותק</strong> — הוא קורא וכותב בקשות חופשה ישירות לכאן.</p>
+      <div class="int-sub" data-i18n="i3Sub">HR system — SSO + REST</div>
+      <p data-i18n-html="i3P">The source-of-truth for everything driver-as-employee: leave balance, payslips, holidays, entitlements. The Portal <strong>doesn't hold a copy</strong> — it reads from and writes leave requests directly here.</p>
       <dl class="int-grid">
-        <dt>סוג</dt><dd>SSO ל-login + REST API ל-data</dd>
-        <dt>תדירות</dt><dd>on-demand (כל לחיצה של הנהג על "יתרת חופשה")</dd>
-        <dt>זרימה</dt><dd>HR → Portal: יתרה, תלושים. Portal → HR: בקשת חופשה חדשה.</dd>
-        <dt>אימות</dt><dd>SSO token; refresh כל 30 דק'</dd>
+        <dt data-i18n="dtType3">Type</dt><dd data-i18n="i3Type">SSO for login + REST API for data</dd>
+        <dt data-i18n="dtFreq3">Frequency</dt><dd data-i18n="i3Freq">On-demand (every driver click on "leave balance")</dd>
+        <dt data-i18n="dtFlow3">Flow</dt><dd data-i18n="i3Flow">HR → Portal: balance, payslips. Portal → HR: new leave request.</dd>
+        <dt data-i18n="dtAuth3">Auth</dt><dd data-i18n="i3Auth">SSO token; refresh every 30 min</dd>
       </dl>
-      <div class="fallback"><strong>Fallback:</strong> ייצוא CSV שבועי לקריאה בלבד; פעולות (הגשת בקשה) מושבתות עד שה-API חוזר.</div>
+      <div class="fallback" data-i18n-html="i3Fallback"><strong>Fallback:</strong> Weekly CSV export for read-only access; actions (submitting requests) disabled until the API returns.</div>
     </div>
 
     <div class="integration">
       <div class="int-num">INT-04</div>
       <div class="int-name">FCM / APNs</div>
-      <div class="int-sub">שירותי Push Notifications של Google ו-Apple</div>
-      <p>שליחת התראות לנייד של הנהג: שינוי בסידור, אישור בקשה, הודעה תפעולית קריטית. כל התראה דורשת read-receipt חוזר ל-Portal.</p>
+      <div class="int-sub" data-i18n="i4Sub">Google and Apple Push Notification services</div>
+      <p data-i18n="i4P">Sending notifications to the driver's phone: schedule changes, request approvals, critical operational messages. Every notification requires a read-receipt back to the Portal.</p>
       <dl class="int-grid">
-        <dt>סוג</dt><dd>Firebase Cloud Messaging (Android) + APNs (iOS)</dd>
-        <dt>תדירות</dt><dd>אירוע (push at event time)</dd>
-        <dt>זרימה</dt><dd>Portal → FCM/APNs → device. read-receipt חוזר דרך ה-App.</dd>
-        <dt>אימות</dt><dd>FCM server key + APNs cert; rotation תקופתית</dd>
+        <dt data-i18n="dtType4">Type</dt><dd data-i18n="i4Type">Firebase Cloud Messaging (Android) + APNs (iOS)</dd>
+        <dt data-i18n="dtFreq4">Frequency</dt><dd data-i18n="i4Freq">Event-based (push at event time)</dd>
+        <dt data-i18n="dtFlow4">Flow</dt><dd data-i18n="i4Flow">Portal → FCM/APNs → device. Read-receipt comes back via the App.</dd>
+        <dt data-i18n="dtAuth4">Auth</dt><dd data-i18n="i4Auth">FCM server key + APNs cert; periodic rotation</dd>
       </dl>
-      <div class="fallback"><strong>Fallback:</strong> הודעה מוצגת ב-In-App Inbox בכניסה הבאה לאפליקציה גם אם ה-push נכשל.</div>
+      <div class="fallback" data-i18n-html="i4Fallback"><strong>Fallback:</strong> Message displayed in the In-App Inbox on next app open, even if the push failed.</div>
     </div>
 
     <div class="integration">
       <div class="int-num">INT-05</div>
       <div class="int-name">Organizational IDP</div>
-      <div class="int-sub">ספק הזהויות הארגוני (Active Directory / Azure AD)</div>
-      <p>זיהוי ראשוני של המשתמש לפני שמירת session ב-Portal. <strong>אין סיסמה ייעודית ל-Portal</strong> — משתמשים בזיהוי הארגוני שכבר קיים לכל עובד. זה גם העיקרון שמכתיב את מנגנון ה-Fallback שלמטה.</p>
+      <div class="int-sub" data-i18n="i5Sub">Organizational identity provider (Active Directory / Azure AD)</div>
+      <p data-i18n-html="i5P">Initial user authentication before storing a session in the Portal. <strong>No dedicated Portal password</strong> — uses the existing organizational identity that every employee already has. This is also the principle that dictates the fallback mechanism below.</p>
       <dl class="int-grid">
-        <dt>סוג</dt><dd>SAML 2.0 או OIDC (תלוי בתשתית הקיימת)</dd>
-        <dt>תדירות</dt><dd>פעם ב-login; refresh לפי policy ארגוני</dd>
-        <dt>זרימה</dt><dd>Browser/App → IDP → Portal session</dd>
-        <dt>אימות</dt><dd>X.509 signing cert; metadata exchange חד-פעמי</dd>
+        <dt data-i18n="dtType5">Type</dt><dd data-i18n="i5Type">SAML 2.0 or OIDC (depends on existing infrastructure)</dd>
+        <dt data-i18n="dtFreq5">Frequency</dt><dd data-i18n="i5Freq">Once per login; refresh per organizational policy</dd>
+        <dt data-i18n="dtFlow5">Flow</dt><dd data-i18n="i5Flow">Browser/App → IDP → Portal session</dd>
+        <dt data-i18n="dtAuth5">Auth</dt><dd data-i18n="i5Auth">X.509 signing cert; one-time metadata exchange</dd>
       </dl>
-      <div class="fallback"><strong>Fallback (מובדל לפי תפקיד — כי IDP למטה לא מאפשר אימות זהות אמיתי):</strong><br/>
-        • <strong>דיספצ'רים ומנהלים</strong> — Emergency Access עם MFA משני (טוקן חומרה / קוד OTP מראש) תחת בקרת מנהל אבטחה. מבטיח נראות תפעולית גם בזמן downtime.<br/>
-        • <strong>נהגים</strong> — לא מקבלים Emergency Access ל-Portal (בניית מערכת ניהול משתמשים מקבילה תסתור את עיקרון "Portal לא מחזיק נתונים"). במקום זה: סידור היומי נשלח אוטומטית כ-SMS, ומוקד תפעולי מקבל את כל הפניות בטלפון עד שה-IDP חוזר.
+      <div class="fallback" data-i18n-html="i5Fallback"><strong>Fallback (differentiated by role — because IDP downtime doesn't allow real identity verification):</strong><br/>
+        • <strong>Dispatchers and managers</strong> — Emergency Access with secondary MFA (hardware token / pre-shared OTP) under security manager control. Ensures operational visibility even during downtime.<br/>
+        • <strong>Drivers</strong> — Do not get Emergency Access to the Portal (building a parallel user management system would contradict the "Portal doesn't hold data" principle). Instead: daily schedule sent automatically as SMS, and the ops center handles all inquiries by phone until IDP returns.
       </div>
     </div>
   </div>
@@ -182,54 +204,54 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">טבלת ריכוז — חמש האינטגרציות במבט אחד</h2>
-    <p>סיכום של כל המפרטים שלמעלה. שימושי כדף עזר לדיון Steering Committee, ולתיעוד כניסה לפיתוח.</p>
+    <h2 class="h2" data-i18n="s2Title">Summary table — all five integrations at a glance</h2>
+    <p data-i18n="s2P">A summary of all specs above. Useful as a reference sheet for Steering Committee discussion, and as a hand-off for development.</p>
 
     <table style="width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px;">
       <thead>
         <tr style="background: var(--ink); color: #fff;">
-          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">מזהה</th>
-          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">מערכת מקור</th>
-          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">סוג חיבור</th>
-          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">כיוון</th>
-          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);">Fallback</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);" data-i18n="tblId">ID</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);" data-i18n="tblSrc">Source system</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);" data-i18n="tblConn">Connection type</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);" data-i18n="tblDir">Direction</th>
+          <th style="padding: 10px 12px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--ink);" data-i18n="tblFb">Fallback</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-01</td>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">Scheduling</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">REST (Push)</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">מערכת ← פורטל</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">העלאת Excel ידנית ע"י דיספצ'ר</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);" data-i18n="r1Conn">REST (Push)</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r1Dir">System → Portal</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r1Fb">Manual Excel upload by dispatcher</td>
         </tr>
         <tr style="background: var(--card);">
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-02</td>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">Dispatch</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">Webhook (ראשי) + REST</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">דו-כיווני</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">Polling אגרסיבי + פאנל ידני במוקד</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);" data-i18n="r2Conn">Webhook (primary) + REST</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r2Dir">Bi-directional</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r2Fb">Aggressive polling + manual ops panel</td>
         </tr>
         <tr>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-03</td>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">HR System</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">SSO + REST</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">דו-כיווני</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">קריאה בלבד (CSV), חסימת כתיבה</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);" data-i18n="r3Conn">SSO + REST</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r3Dir">Bi-directional</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r3Fb">Read-only (CSV), write blocked</td>
         </tr>
         <tr style="background: var(--card);">
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-04</td>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">FCM / APNs</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">Push Notification</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">פורטל ← מכשיר</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">In-App Inbox (קריאה בכניסה הבאה)</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);" data-i18n="r4Conn">Push Notification</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r4Dir">Portal → device</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r4Fb">In-App Inbox (read on next visit)</td>
         </tr>
         <tr>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700;">INT-05</td>
           <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); font-weight: 500; color: var(--ink);">Org IDP</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);">SAML 2.0 / OIDC</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">משתמש ← IDP</td>
-          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);">Emergency Access לניהול (MFA); נהגים — SMS אוטומטי</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim);" data-i18n="r5Conn">SAML 2.0 / OIDC</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r5Dir">User → IDP</td>
+          <td style="padding: 10px 12px; border: 1px solid var(--rule-dim); color: var(--muted);" data-i18n="r5Fb">Emergency Access for management (MFA); drivers — automatic SMS</td>
         </tr>
       </tbody>
     </table>
@@ -238,19 +260,200 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">למה ה-fallbacks חיו במפרט מהשורה הראשונה</h2>
-    <p>לפני שאישרתי שורה אחת של פונקציונליות, שאלתי על כל אינטגרציה אותה שאלה: <strong>מה קורה כשהצד השני לא זמין?</strong> התשובה לא יכולה להיות "מערכת לא זמינה — נא לפנות לתמיכה". זה מסיט את הסיכון התפעולי לנהג שבדיוק עומד להתחיל משמרת.</p>
-    <p>כל fallback בטבלאות למעלה הוא תוצר של דרישה אופרטיבית אחת: <strong>המערכת חייבת להמשיך לעבוד גם כשאחד הצדדים נופל</strong>. ייבוא Excel ידני, polling במקום webhook, ייצוא CSV שבועי, In-App Inbox במקום push — אלה לא פשרות. הם החלטות שמורידות את הסיכון לאפס בתסריטים שיקרו, לא אם, אלא מתי.</p>
-    <p>זה השוני בין מפרט שאישרתי לחתימה לבין מפרט שלמדתי על קיומו אחרי ה-go-live. את ההפרש הזה הארגון לא רוצה לגלות בשטח.</p>
+    <h2 class="h2" data-i18n="s3Title">Why fallbacks lived in the spec from day one</h2>
+    <p data-i18n-html="s3P1">Before approving a single line of functionality, I asked the same question about every integration: <strong>what happens when the other side isn't available?</strong> The answer can't be "system unavailable — please contact support." That just transfers operational risk to the driver who's about to start their shift.</p>
+    <p data-i18n-html="s3P2">Every fallback in the tables above is the product of one operational requirement: <strong>the system must keep working even when one of the parties goes down</strong>. Manual Excel import, polling instead of webhook, weekly CSV export, In-App Inbox instead of push — these aren't compromises. They are decisions that reduce risk to zero in scenarios that will occur — not if, but when.</p>
+    <p data-i18n="s3P3">That's the difference between a spec I signed off on, and a spec I learned about after go-live. That gap is not one the organization wants to discover in the field.</p>
   </div>
 </section>
 
 <footer>
   <div class="container narrow">
-    <p>חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026</p>
-    <p style="margin-top: 8px;"><a class="back" href="index.html">← חזרה ל-Case Study</a></p>
+    <p data-i18n="footerP">Part of Nati Yevarkan's portfolio. Self-initiated analysis, not commissioned by any organization. © 2026</p>
+    <p style="margin-top: 8px;"><a class="back" href="index.html" data-i18n="backLink2">← Back to Case Study</a></p>
   </div>
 </footer>
+
+<script>
+  const translations = {
+    en: {
+      backLink: '← Back to Case Study',
+      backLink2: '← Back to Case Study',
+      pageId: 'API',
+      eyebrow: 'Integration Specification',
+      heroH1: 'Five integrations with source systems',
+      heroLead: "The Portal doesn't hold its own data — it's a window into several systems that already exist in the organization. Each integration defines: connection type, data direction, frequency, and a fallback path if the source system isn't available. (BRD §5)",
+      s1Title: 'The five integrations, one by one',
+      i1Sub: 'Work scheduling system — source of the daily schedule',
+      i1P: 'Sends the work schedule to the Portal on every change. <strong>This is the core data flow</strong> that feeds all the driver\'s "today and tomorrow" screens.',
+      dtType: 'Type', dtFreq: 'Frequency', dtFlow: 'Flow', dtAuth: 'Auth',
+      dtType2: 'Type', dtFreq2: 'Frequency', dtFlow2: 'Flow', dtAuth2: 'Auth',
+      dtType3: 'Type', dtFreq3: 'Frequency', dtFlow3: 'Flow', dtAuth3: 'Auth',
+      dtType4: 'Type', dtFreq4: 'Frequency', dtFlow4: 'Flow', dtAuth4: 'Auth',
+      dtType5: 'Type', dtFreq5: 'Frequency', dtFlow5: 'Flow', dtAuth5: 'Auth',
+      i1Type: 'REST API (JSON) — push on change',
+      i1Freq: 'Push events (on every change) + daily sync for consistency check',
+      i1Flow: 'Scheduling → Portal: driver-shift assignments, changes, additions, cancellations',
+      i1Auth: 'Unique <code>shift_id</code> + checksum on the whole payload',
+      i1Fallback: "<strong>Fallback:</strong> If the API isn't available — manual Excel import by dispatcher, once a day. Same record schema is preserved.",
+      i2Sub: 'Operations center — ride coordination (taxis / pickup vehicles)',
+      i2P: "Two directions: driver sends a pickup request via the Portal, ops approves/assigns a vehicle, and status updates flow back to the Portal until the vehicle arrives. <strong>A taxi ETA at night can't tolerate a 15-minute delay</strong> — so the architecture here is event-driven from the start.",
+      i2Type: '<strong>Webhook (primary)</strong> + REST polling as fallback only',
+      i2Freq: 'Webhook on every status change (real-time). Polling every 10 min only to catch missed events (network blip, downtime).',
+      i2Flow: 'Portal → Dispatch: request. Dispatch → Portal (webhook): approval, vehicle, ETA, live status on every change.',
+      i2Auth: 'OAuth2 + driver_id bound to request; webhook signed with HMAC for source verification',
+      i2Fallback: '<strong>Fallback:</strong> If the webhook fails over time (>15 min without a heartbeat) — automatic switch to aggressive polling (once per minute) + manual admin panel in ops for status updates.',
+      i3Sub: 'HR system — SSO + REST',
+      i3P: "The source-of-truth for everything driver-as-employee: leave balance, payslips, holidays, entitlements. The Portal <strong>doesn't hold a copy</strong> — it reads from and writes leave requests directly here.",
+      i3Type: 'SSO for login + REST API for data',
+      i3Freq: 'On-demand (every driver click on "leave balance")',
+      i3Flow: 'HR → Portal: balance, payslips. Portal → HR: new leave request.',
+      i3Auth: 'SSO token; refresh every 30 min',
+      i3Fallback: '<strong>Fallback:</strong> Weekly CSV export for read-only access; actions (submitting requests) disabled until the API returns.',
+      i4Sub: 'Google and Apple Push Notification services',
+      i4P: "Sending notifications to the driver's phone: schedule changes, request approvals, critical operational messages. Every notification requires a read-receipt back to the Portal.",
+      i4Type: 'Firebase Cloud Messaging (Android) + APNs (iOS)',
+      i4Freq: 'Event-based (push at event time)',
+      i4Flow: 'Portal → FCM/APNs → device. Read-receipt comes back via the App.',
+      i4Auth: 'FCM server key + APNs cert; periodic rotation',
+      i4Fallback: '<strong>Fallback:</strong> Message displayed in the In-App Inbox on next app open, even if the push failed.',
+      i5Sub: 'Organizational identity provider (Active Directory / Azure AD)',
+      i5P: 'Initial user authentication before storing a session in the Portal. <strong>No dedicated Portal password</strong> — uses the existing organizational identity that every employee already has. This is also the principle that dictates the fallback mechanism below.',
+      i5Type: 'SAML 2.0 or OIDC (depends on existing infrastructure)',
+      i5Freq: 'Once per login; refresh per organizational policy',
+      i5Flow: 'Browser/App → IDP → Portal session',
+      i5Auth: 'X.509 signing cert; one-time metadata exchange',
+      i5Fallback: "<strong>Fallback (differentiated by role — because IDP downtime doesn't allow real identity verification):</strong><br/>• <strong>Dispatchers and managers</strong> — Emergency Access with secondary MFA (hardware token / pre-shared OTP) under security manager control. Ensures operational visibility even during downtime.<br/>• <strong>Drivers</strong> — Do not get Emergency Access to the Portal (building a parallel user management system would contradict the \"Portal doesn't hold data\" principle). Instead: daily schedule sent automatically as SMS, and the ops center handles all inquiries by phone until IDP returns.",
+      s2Title: 'Summary table — all five integrations at a glance',
+      s2P: 'A summary of all specs above. Useful as a reference sheet for Steering Committee discussion, and as a hand-off for development.',
+      tblId: 'ID', tblSrc: 'Source system', tblConn: 'Connection type', tblDir: 'Direction', tblFb: 'Fallback',
+      r1Conn: 'REST (Push)', r1Dir: 'System → Portal', r1Fb: 'Manual Excel upload by dispatcher',
+      r2Conn: 'Webhook (primary) + REST', r2Dir: 'Bi-directional', r2Fb: 'Aggressive polling + manual ops panel',
+      r3Conn: 'SSO + REST', r3Dir: 'Bi-directional', r3Fb: 'Read-only (CSV), write blocked',
+      r4Conn: 'Push Notification', r4Dir: 'Portal → device', r4Fb: 'In-App Inbox (read on next visit)',
+      r5Conn: 'SAML 2.0 / OIDC', r5Dir: 'User → IDP', r5Fb: 'Emergency Access for management (MFA); drivers — automatic SMS',
+      s3Title: 'Why fallbacks lived in the spec from day one',
+      s3P1: "Before approving a single line of functionality, I asked the same question about every integration: <strong>what happens when the other side isn't available?</strong> The answer can't be \"system unavailable — please contact support.\" That just transfers operational risk to the driver who's about to start their shift.",
+      s3P2: 'Every fallback in the tables above is the product of one operational requirement: <strong>the system must keep working even when one of the parties goes down</strong>. Manual Excel import, polling instead of webhook, weekly CSV export, In-App Inbox instead of push — these aren\'t compromises. They are decisions that reduce risk to zero in scenarios that will occur — not if, but when.',
+      s3P3: "That's the difference between a spec I signed off on, and a spec I learned about after go-live. That gap is not one the organization wants to discover in the field.",
+      footerP: "Part of Nati Yevarkan's portfolio. Self-initiated analysis, not commissioned by any organization. © 2026"
+    },
+    he: {
+      backLink: '← חזרה ל-Case Study',
+      backLink2: '← חזרה ל-Case Study',
+      pageId: 'API',
+      eyebrow: 'Integration Specification',
+      heroH1: 'חמש אינטגרציות עם מערכות מקור',
+      heroLead: 'ה-Portal לא מחזיק נתונים משלו — הוא חלון לכמה מערכות שכבר קיימות בארגון. לכל אינטגרציה הוגדרו: סוג חיבור, כיוון נתונים, תדירות, ומסלול fallback אם המערכת המקור לא זמינה. (BRD §5)',
+      s1Title: 'חמש האינטגרציות, אחת אחת',
+      i1Sub: 'מערכת סידור עבודה — מקור הסידור היומי',
+      i1P: 'שולחת ל-Portal את סידור העבודה בכל פעם שיש שינוי. <strong>זה ה-core data flow</strong> שמזין את כל מסכי ה"היום ומחר" של הנהג.',
+      dtType: 'סוג', dtFreq: 'תדירות', dtFlow: 'זרימה', dtAuth: 'אימות',
+      dtType2: 'סוג', dtFreq2: 'תדירות', dtFlow2: 'זרימה', dtAuth2: 'אימות',
+      dtType3: 'סוג', dtFreq3: 'תדירות', dtFlow3: 'זרימה', dtAuth3: 'אימות',
+      dtType4: 'סוג', dtFreq4: 'תדירות', dtFlow4: 'זרימה', dtAuth4: 'אימות',
+      dtType5: 'סוג', dtFreq5: 'תדירות', dtFlow5: 'זרימה', dtAuth5: 'אימות',
+      i1Type: 'REST API (JSON) — push on change',
+      i1Freq: 'אירועי-דחיפה (בכל שינוי) + sync יומי לבדיקת עקביות',
+      i1Flow: 'Scheduling → Portal: שיוך נהג למשמרת, שינויים, הוספות, ביטולים',
+      i1Auth: '<code>shift_id</code> ייחודי + checksum על כל ה-payload',
+      i1Fallback: '<strong>Fallback:</strong> אם ה-API לא זמין — ייבוא ידני של Excel ע"י דיספצ\'ר, פעם ביום. נשמרת אותה סכמת רשומות.',
+      i2Sub: 'מוקד תפעולי — תיאום הסעות (מוניות / רכבי איסוף)',
+      i2P: 'שני כיוונים: נהג שולח בקשת איסוף דרך ה-Portal, מוקד מאשר/מקצה רכב, ועדכון סטטוס חוזר ל-Portal עד הגעת הרכב. <strong>ETA למונית בלילה לא יכול לסבול 15 דקות עיכוב</strong> — לכן הארכיטקטורה כאן event-driven מהיסוד.',
+      i2Type: '<strong>Webhook (ראשי)</strong> + REST polling כ-fallback בלבד',
+      i2Freq: 'Webhook על כל שינוי סטטוס (real-time). Polling פעם ב-10 דק\' רק לאיתור אירועים שאבדו (network blip, downtime).',
+      i2Flow: 'Portal → Dispatch: בקשה. Dispatch → Portal (webhook): אישור, רכב, ETA, סטטוס חי בכל שינוי.',
+      i2Auth: 'OAuth2 + driver_id משויך לבקשה; webhook חתום עם HMAC לאימות מקור',
+      i2Fallback: '<strong>Fallback:</strong> אם ה-webhook נופל לאורך זמן (>15 דק\' ללא פעימה) — מעבר אוטומטי ל-polling אגרסיבי (פעם בדקה) + פאנל admin ידני במוקד לעדכון סטטוס.',
+      i3Sub: 'מערכת משאבי אנוש — SSO + REST',
+      i3P: 'מקור-האמת לכל מה שקשור לנהג כעובד: יתרת חופשה, תלושי שכר, חגים, זכאויות. ה-Portal <strong>לא מחזיק עותק</strong> — הוא קורא וכותב בקשות חופשה ישירות לכאן.',
+      i3Type: 'SSO ל-login + REST API ל-data',
+      i3Freq: 'on-demand (כל לחיצה של הנהג על "יתרת חופשה")',
+      i3Flow: 'HR → Portal: יתרה, תלושים. Portal → HR: בקשת חופשה חדשה.',
+      i3Auth: 'SSO token; refresh כל 30 דק\'',
+      i3Fallback: '<strong>Fallback:</strong> ייצוא CSV שבועי לקריאה בלבד; פעולות (הגשת בקשה) מושבתות עד שה-API חוזר.',
+      i4Sub: 'שירותי Push Notifications של Google ו-Apple',
+      i4P: 'שליחת התראות לנייד של הנהג: שינוי בסידור, אישור בקשה, הודעה תפעולית קריטית. כל התראה דורשת read-receipt חוזר ל-Portal.',
+      i4Type: 'Firebase Cloud Messaging (Android) + APNs (iOS)',
+      i4Freq: 'אירוע (push at event time)',
+      i4Flow: 'Portal → FCM/APNs → device. read-receipt חוזר דרך ה-App.',
+      i4Auth: 'FCM server key + APNs cert; rotation תקופתית',
+      i4Fallback: '<strong>Fallback:</strong> הודעה מוצגת ב-In-App Inbox בכניסה הבאה לאפליקציה גם אם ה-push נכשל.',
+      i5Sub: 'ספק הזהויות הארגוני (Active Directory / Azure AD)',
+      i5P: 'זיהוי ראשוני של המשתמש לפני שמירת session ב-Portal. <strong>אין סיסמה ייעודית ל-Portal</strong> — משתמשים בזיהוי הארגוני שכבר קיים לכל עובד. זה גם העיקרון שמכתיב את מנגנון ה-Fallback שלמטה.',
+      i5Type: 'SAML 2.0 או OIDC (תלוי בתשתית הקיימת)',
+      i5Freq: 'פעם ב-login; refresh לפי policy ארגוני',
+      i5Flow: 'Browser/App → IDP → Portal session',
+      i5Auth: 'X.509 signing cert; metadata exchange חד-פעמי',
+      i5Fallback: '<strong>Fallback (מובדל לפי תפקיד — כי IDP למטה לא מאפשר אימות זהות אמיתי):</strong><br/>• <strong>דיספצ\'רים ומנהלים</strong> — Emergency Access עם MFA משני (טוקן חומרה / קוד OTP מראש) תחת בקרת מנהל אבטחה. מבטיח נראות תפעולית גם בזמן downtime.<br/>• <strong>נהגים</strong> — לא מקבלים Emergency Access ל-Portal (בניית מערכת ניהול משתמשים מקבילה תסתור את עיקרון "Portal לא מחזיק נתונים"). במקום זה: סידור היומי נשלח אוטומטית כ-SMS, ומוקד תפעולי מקבל את כל הפניות בטלפון עד שה-IDP חוזר.',
+      s2Title: 'טבלת ריכוז — חמש האינטגרציות במבט אחד',
+      s2P: 'סיכום של כל המפרטים שלמעלה. שימושי כדף עזר לדיון Steering Committee, ולתיעוד כניסה לפיתוח.',
+      tblId: 'מזהה', tblSrc: 'מערכת מקור', tblConn: 'סוג חיבור', tblDir: 'כיוון', tblFb: 'Fallback',
+      r1Conn: 'REST (Push)', r1Dir: 'מערכת ← פורטל', r1Fb: 'העלאת Excel ידנית ע"י דיספצ\'ר',
+      r2Conn: 'Webhook (ראשי) + REST', r2Dir: 'דו-כיווני', r2Fb: 'Polling אגרסיבי + פאנל ידני במוקד',
+      r3Conn: 'SSO + REST', r3Dir: 'דו-כיווני', r3Fb: 'קריאה בלבד (CSV), חסימת כתיבה',
+      r4Conn: 'Push Notification', r4Dir: 'פורטל ← מכשיר', r4Fb: 'In-App Inbox (קריאה בכניסה הבאה)',
+      r5Conn: 'SAML 2.0 / OIDC', r5Dir: 'משתמש ← IDP', r5Fb: 'Emergency Access לניהול (MFA); נהגים — SMS אוטומטי',
+      s3Title: 'למה ה-fallbacks חיו במפרט מהשורה הראשונה',
+      s3P1: 'לפני שאישרתי שורה אחת של פונקציונליות, שאלתי על כל אינטגרציה אותה שאלה: <strong>מה קורה כשהצד השני לא זמין?</strong> התשובה לא יכולה להיות "מערכת לא זמינה — נא לפנות לתמיכה". זה מסיט את הסיכון התפעולי לנהג שבדיוק עומד להתחיל משמרת.',
+      s3P2: 'כל fallback בטבלאות למעלה הוא תוצר של דרישה אופרטיבית אחת: <strong>המערכת חייבת להמשיך לעבוד גם כשאחד הצדדים נופל</strong>. ייבוא Excel ידני, polling במקום webhook, ייצוא CSV שבועי, In-App Inbox במקום push — אלה לא פשרות. הם החלטות שמורידות את הסיכון לאפס בתסריטים שיקרו, לא אם, אלא מתי.',
+      s3P3: 'זה השוני בין מפרט שאישרתי לחתימה לבין מפרט שלמדתי על קיומו אחרי ה-go-live. את ההפרש הזה הארגון לא רוצה לגלות בשטח.',
+      footerP: 'חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026'
+    }
+  };
+
+  const docMeta = {
+    en: {
+      title: 'API · Integration Specification — Driver Portal',
+      description: '5 integrations with source systems: scheduling, dispatch, HR, push, IDP — the Integration Spec explainer.'
+    },
+    he: {
+      title: 'API · מפרט אינטגרציות — Driver Portal',
+      description: '5 אינטגרציות עם מערכות מקור: scheduling, dispatch, HR, push, IDP — דף הסבר ל-Integration Spec.'
+    }
+  };
+
+  function applyLanguage(lang) {
+    const dict = translations[lang];
+    if (!dict) return;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'he') ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    if (docMeta[lang]) {
+      document.title = docMeta[lang].title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', docMeta[lang].description);
+    }
+    const toggle = document.getElementById('langToggle');
+    if (toggle) {
+      toggle.textContent = (lang === 'en') ? 'HE' : 'EN';
+      toggle.setAttribute('aria-label', (lang === 'en') ? 'Switch to Hebrew' : 'Switch to English');
+    }
+    try { localStorage.setItem('siteLang', lang); } catch (e) {}
+  }
+
+  let initialLang = 'en';
+  try {
+    const stored = localStorage.getItem('siteLang');
+    if (stored === 'he' || stored === 'en') initialLang = stored;
+  } catch (e) {}
+  applyLanguage(initialLang);
+
+  const langToggleBtn = document.getElementById('langToggle');
+  if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.lang === 'he' ? 'he' : 'en';
+      applyLanguage(current === 'en' ? 'he' : 'en');
+    });
+  }
+</script>
 
 </body>
 </html>

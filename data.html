@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ERD · מודל הנתונים הלוגי — Driver Portal</title>
-<meta name="description" content="6 ישויות, יחסים, וניתוח נורמליזציה — דף הסבר ל-ERD של פרויקט Driver Portal." />
+<title>ERD · Conceptual Data Model — Driver Portal</title>
+<meta name="description" content="6 entities, relationships, and normalization analysis — the ERD explainer for the Driver Portal project." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -21,8 +21,23 @@ a:hover { text-decoration: underline; }
 .narrow { max-width: 760px; }
 .mast { border-bottom: 1px solid var(--rule-dim); padding: 18px 0; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
 .mast-inner { display: flex; justify-content: space-between; align-items: center; }
+.mast-actions { display: flex; align-items: center; gap: 14px; }
 .back { color: var(--accent); }
 .back:hover { text-decoration: underline; }
+.lang-toggle {
+  background: rgba(20, 33, 61, 0.06);
+  color: var(--ink);
+  border: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.lang-toggle:hover { background: var(--ink); color: #fff; transform: translateY(-1px); }
 .hero { padding: 64px 0 40px; border-bottom: 1px solid var(--rule); }
 .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.16em; color: var(--accent); text-transform: uppercase; margin-bottom: 18px; font-weight: 500; }
 .h1 { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: clamp(32px, 5vw, 52px); line-height: 1.1; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 20px; }
@@ -112,6 +127,10 @@ p strong { color: var(--ink); font-weight: 600; }
 
 .caveat { background: #FEF3C7; border-right: 3px solid var(--accent); padding: 14px 18px; font-size: 14px; line-height: 1.6; margin-top: 24px; }
 
+/* Direction-aware overrides for LTR */
+[dir="ltr"] .caveat { border-right: none; border-left: 3px solid var(--accent); }
+[dir="ltr"] .entity-fields .key { text-align: left; }
+
 footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
 </style>
 </head>
@@ -119,55 +138,58 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
 
 <div class="mast">
   <div class="container mast-inner">
-    <span><a class="back" href="index.html">← חזרה ל-Case Study</a></span>
-    <span>03 · DATA</span>
+    <span><a class="back" href="index.html" data-i18n="backLink">← Back to Case Study</a></span>
+    <div class="mast-actions">
+      <button class="lang-toggle" id="langToggle" aria-label="Switch language">HE</button>
+      <span data-i18n="pageId">DATA</span>
+    </div>
   </div>
 </div>
 
 <header class="hero">
   <div class="container narrow">
-    <div class="eyebrow">Artifact 03 · Conceptual Data Model</div>
-    <h1 class="h1">ERD — מודל הנתונים</h1>
-    <p class="lead">
-      שש ישויות וחמישה יחסים שמשרתים את שלוש הזרימות המרכזיות של ה-Portal: סידור עבודה, הודעות תפעוליות, ובקשות חופשה. כל ישות נגזרת מדרישה תפקודית קונקרטית ב-BRD.
+    <div class="eyebrow" data-i18n="eyebrow">Conceptual Data Model</div>
+    <h1 class="h1" data-i18n="heroH1">ERD — The data model</h1>
+    <p class="lead" data-i18n="heroLead">
+      Six entities and five relationships that serve the Portal's three core flows: work schedule, operational messaging, and leave requests. Every entity derives from a concrete functional requirement in the BRD.
     </p>
   </div>
 </header>
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">תרשים הקשרים</h2>
-    <p>ה-Portal מתממשק למערכות הקיימות בארגון (Scheduling, HR, Dispatch) ומחזיק רק את הנתונים הדרושים לזרימות שלו. התרשים מציג את הישויות והיחסים ברמת הקונספט.</p>
+    <h2 class="h2" data-i18n="s1Title">Relationship diagram</h2>
+    <p data-i18n="s1P">The Portal interfaces with existing systems in the organization (Scheduling, HR, Dispatch) and holds only the data required for its own flows. The diagram shows entities and relationships at the conceptual level.</p>
 
     <div class="erd-wrap">
-      <img src="erd.png" alt="ERD — מודל נתונים קונספטואלי, שש ישויות ויחסיהן" />
+      <img src="erd.png" alt="ERD — Conceptual data model, six entities and their relationships" />
     </div>
     <div class="erd-caption">Figure 1 · Conceptual Entity Relationship Diagram</div>
 
-    <div class="caveat" style="margin-top: 28px;">
-      <strong>הערה על שמות המפתחות (קריאת ה-ERD):</strong><br/>
-      ככלל, כל FK שומר את <strong>אותו שם</strong> כמו ה-PK שאליו הוא מצביע — לדוגמה <code>SHIFT.driver_id</code> מצביע על <code>DRIVER.driver_id</code>, <code>TAXI_REQUEST.shift_id</code> מצביע על <code>SHIFT.shift_id</code>. זה מבטיח שכל קורא מבין באיזה קישור מדובר ללא ספק.
+    <div class="caveat" style="margin-top: 28px;" data-i18n-html="s1Caveat">
+      <strong>A note on key names (reading the ERD):</strong><br/>
+      As a rule, every FK keeps the <strong>same name</strong> as the PK it points to — for example <code>SHIFT.driver_id</code> points to <code>DRIVER.driver_id</code>, <code>TAXI_REQUEST.shift_id</code> points to <code>SHIFT.shift_id</code>. This ensures every reader knows which link they're looking at, without ambiguity.
       <br/><br/>
-      <strong>היוצא דופן:</strong> כשטבלה מתייחסת לאותה ישות בכמה תפקידים, ה-FK מקבל שם תפקיד — לא שם הישות. בדיוק כפי שבמסמך משפטי "מבקש" ו"מאשר" לא נקראים שניהם "צד". במודל הזה:
+      <strong>The exception:</strong> when a table references the same entity in multiple roles, the FK takes a role name — not the entity's name. Just as in a legal document "petitioner" and "approver" aren't both called "party." In this model:
       <ul style="margin: 8px 18px 0;">
-        <li style="margin-bottom: 4px;"><code>MESSAGE.sender_id</code> → DRIVER בתפקיד <strong>שולח</strong> (לא נמען — אלה דרך ACKNOWLEDGMENT_LOG)</li>
-        <li><code>LEAVE_REQUEST.approver_id</code> → DRIVER בתפקיד <strong>מאשר</strong> (לצד <code>driver_id</code> שהוא ה<strong>מבקש</strong>; שתי שורות מאותה טבלה לאותו יעד, בלתי אפשרי לזהות בלי שמות תפקיד).</li>
+        <li style="margin-bottom: 4px;"><code>MESSAGE.sender_id</code> → DRIVER in the role of <strong>sender</strong> (not recipient — those go via ACKNOWLEDGMENT_LOG)</li>
+        <li><code>LEAVE_REQUEST.approver_id</code> → DRIVER in the role of <strong>approver</strong> (alongside <code>driver_id</code> who is the <strong>requester</strong>; two rows from the same table to the same target, impossible to identify without role names).</li>
       </ul>
       <br/>
-      בתווית הקשר ב-ERD מופיע השם של ה-FK בפועל ("via sender_id") — כדי שהקורא לעולם לא יצטרך לנחש איך החיבור נעשה.
+      The relationship label in the ERD shows the actual FK name ("via sender_id") — so the reader never has to guess how the connection is made.
     </div>
   </div>
 </section>
 
 <section>
   <div class="container narrow">
-    <h2 class="h2">הסבר על כל ישות</h2>
+    <h2 class="h2" data-i18n="s2Title">Explanation of each entity</h2>
 
     <div class="entity-block">
       <div class="entity-num">E1</div>
       <div class="entity-name">DRIVER</div>
-      <div class="entity-tag">הנהג — הגורם המרכזי במודל</div>
-      <p>פרופיל הנהג: שם, מספר עובד (MIRS), דיפו, פלאפון, וקישור חיצוני ל-HR System. כל הזרימות במערכת מתחילות מזיהוי הנהג. ה-<code>hr_external_id</code> הוא ה-FK ל-HR System of Record — לא מחזיקים יתרת חופשה או תלוש שכר ב-Portal, רק את המפתח.</p>
+      <div class="entity-tag" data-i18n="e1Tag">The driver — the central actor in the model</div>
+      <p data-i18n-html="e1P">Driver profile: name, employee number (MIRS), depot, phone, and an external link to the HR System. Every flow in the system starts with driver identification. The <code>hr_external_id</code> is the FK to the HR System of Record — we don't hold leave balance or payslips in the Portal, only the key.</p>
       <div class="entity-fields">
         <div class="f"><span class="type">int</span><span class="name">driver_id</span><span class="key">PK</span></div>
         <div class="f"><span class="type">string</span><span class="name">name</span><span class="key"></span></div>
@@ -181,8 +203,8 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
     <div class="entity-block">
       <div class="entity-num">E2</div>
       <div class="entity-name">SHIFT</div>
-      <div class="entity-tag">משמרת בודדת של נהג ביום נתון</div>
-      <p>סידור היומי — לכל נהג ביום אחד יכולה להיות משמרת אחת בלבד (UNIQUE על שילוב driver+date). שדה <code>shift_type</code> מטפל בערכים: בוקר, צהריים, לילה, חופש, כוננות, מוכן. <code>instructor_name</code> מאוכלס רק במשמרות הדרכה — שמירת השדה ברמת ה-SHIFT (ולא טבלה נפרדת) נכונה כי הוא תלוי-משמרת, לא תלוי-נהג.</p>
+      <div class="entity-tag" data-i18n="e2Tag">A single shift of a driver on a given day</div>
+      <p data-i18n-html="e2P">The daily schedule — each driver can have only one shift per day (UNIQUE on driver+date). The <code>shift_type</code> field handles values: morning, afternoon, night, leave, on-call, standby. <code>instructor_name</code> is populated only for training shifts — keeping the field at the SHIFT level (and not a separate table) is correct because it's shift-dependent, not driver-dependent.</p>
       <div class="entity-fields">
         <div class="f"><span class="type">int</span><span class="name">shift_id</span><span class="key">PK</span></div>
         <div class="f"><span class="type">int</span><span class="name">driver_id</span><span class="key">FK</span></div>
@@ -198,8 +220,8 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
     <div class="entity-block">
       <div class="entity-num">E3</div>
       <div class="entity-name">TAXI_REQUEST</div>
-      <div class="entity-tag">בקשת הסעה — מקושרת אופציונלית למשמרת</div>
-      <p>לא כל משמרת דורשת הסעה. הפרדה לישות נפרדת מאפשרת לעדכן את ה-status של הבקשה (נוצרה, שובץ רכב, בדרך, הגיע, בוטל) <strong>בלי לגעת ברשומת המשמרת</strong> — חשוב כי המשמרת היא רשומה יציבה תפעולית, והבקשה משתנה תכופות.</p>
+      <div class="entity-tag" data-i18n="e3Tag">Ride request — optionally linked to a shift</div>
+      <p data-i18n-html="e3P">Not every shift requires a ride. Separating into its own entity lets us update the request's status (created, vehicle assigned, en route, arrived, cancelled) <strong>without touching the shift record</strong> — important because the shift is an operationally stable record, while the request changes frequently.</p>
       <div class="entity-fields">
         <div class="f"><span class="type">int</span><span class="name">request_id</span><span class="key">PK</span></div>
         <div class="f"><span class="type">int</span><span class="name">shift_id</span><span class="key">FK</span></div>
@@ -214,8 +236,8 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
     <div class="entity-block">
       <div class="entity-num">E4</div>
       <div class="entity-name">MESSAGE</div>
-      <div class="entity-tag">הודעה תפעולית — נשלחת לקבוצה</div>
-      <p>הודעה אחת יכולה להישלח לקהל — קו ספציפי, דיפו, או כל הנהגים הפעילים. <code>audience_filter</code> נשמר כשאילתה, לא כרשימה — כדי שהקהל יחושב מחדש בכל פעם (לדוגמה, אם נהג נוסף לקו אחרי שליחת ההודעה). <code>requires_ack</code> משמש לציון הודעות בטיחות שמחייבות אישור קריאה מפורש.</p>
+      <div class="entity-tag" data-i18n="e4Tag">Operational message — sent to a group</div>
+      <p data-i18n-html="e4P">A single message can be sent to an audience — a specific line, a depot, or all active drivers. <code>audience_filter</code> is stored as a query, not a list — so the audience is recomputed each time (e.g., if a driver is added to a line after the message was sent). <code>requires_ack</code> marks safety messages that require explicit read acknowledgment.</p>
       <div class="entity-fields">
         <div class="f"><span class="type">int</span><span class="name">message_id</span><span class="key">PK</span></div>
         <div class="f"><span class="type">int</span><span class="name">sender_id</span><span class="key">FK</span></div>
@@ -231,8 +253,8 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
     <div class="entity-block">
       <div class="entity-num">E5</div>
       <div class="entity-name">ACKNOWLEDGMENT_LOG</div>
-      <div class="entity-tag">תיעוד אישור קריאה — לוג רב-מימדי</div>
-      <p>זה הקטע שבו הפכתי קשר N:M בין הודעה לנהגים לטבלה משלו. כל הודעה נשלחת לקבוצה, וכל נהג בקבוצה צריך לאשר אותה <strong>בנפרד</strong>. הוצאת ה-log לטבלה נפרדת מאפשרת לדעת מי קרא, מתי, ועל איזה מכשיר — נתון שדרוש לרגולציה (BRD §8 — privacy) ולחקירת תקרית במידה שיש.</p>
+      <div class="entity-tag" data-i18n="e5Tag">Read-receipt log — multi-dimensional</div>
+      <p data-i18n-html="e5P">This is where I turned an N:M relationship between message and drivers into its own table. Each message goes to a group, and every driver in the group needs to acknowledge it <strong>individually</strong>. Extracting the log into a separate table lets us know who read, when, and on which device — data required for regulatory compliance (BRD Section 8 — privacy) and for incident investigation if needed.</p>
       <div class="entity-fields">
         <div class="f"><span class="type">int</span><span class="name">ack_id</span><span class="key">PK</span></div>
         <div class="f"><span class="type">int</span><span class="name">message_id</span><span class="key">FK</span></div>
@@ -246,8 +268,8 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
     <div class="entity-block">
       <div class="entity-num">E6</div>
       <div class="entity-name">LEAVE_REQUEST</div>
-      <div class="entity-tag">בקשת חופשה — תיעוד מלא של מחזור החיים</div>
-      <p>כל בקשה נשמרת מהגשתה ועד החלטה — כולל החלטות שליליות עם נימוק. <code>approver_id</code> מקושר ל-DRIVER (מנהל הוא גם נהג במודל הזה — חוסך טבלת USER נפרדת). <code>decision_note</code> חובה אם <code>status</code> = "נדחתה" — כלל עסקי שמתועד גם ברמת DB ולא רק UI.</p>
+      <div class="entity-tag" data-i18n="e6Tag">Leave request — full lifecycle documentation</div>
+      <p data-i18n-html="e6P">Each request is preserved from submission to decision — including negative decisions with reasoning. <code>approver_id</code> links to DRIVER (a manager is also a driver in this model — saves a separate USER table). <code>decision_note</code> is required if <code>status</code> = "denied" — a business rule documented at the DB level, not just the UI.</p>
       <div class="entity-fields">
         <div class="f"><span class="type">int</span><span class="name">leave_id</span><span class="key">PK</span></div>
         <div class="f"><span class="type">int</span><span class="name">driver_id</span><span class="key">FK</span></div>
@@ -260,18 +282,127 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
       </div>
     </div>
 
-    <div class="caveat">
-      <strong>מה לא נכלל ב-ERD הזה במכוון:</strong> טבלאות תפעול של המערכת עצמה (audit log, session, push_token) — אלה שכבת תשתית, לא חלק מהמודל העסקי. הם מתועדים ב-Technical Spec הנפרד, לא ב-BRD.
+    <div class="caveat" data-i18n-html="s2Caveat">
+      <strong>What is deliberately not in this ERD:</strong> operational tables of the system itself (audit log, session, push_token) — these are infrastructure layer, not part of the business model. They are documented in the separate Technical Spec, not the BRD.
     </div>
   </div>
 </section>
 
 <footer>
   <div class="container narrow">
-    <p>חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026</p>
-    <p style="margin-top: 8px;"><a class="back" href="index.html">← חזרה ל-Case Study</a></p>
+    <p data-i18n="footerP">Part of Nati Yevarkan's portfolio. Self-initiated analysis, not commissioned by any organization. © 2026</p>
+    <p style="margin-top: 8px;"><a class="back" href="index.html" data-i18n="backLink2">← Back to Case Study</a></p>
   </div>
 </footer>
+
+<script>
+  const translations = {
+    en: {
+      backLink: '← Back to Case Study',
+      backLink2: '← Back to Case Study',
+      pageId: 'DATA',
+      eyebrow: 'Conceptual Data Model',
+      heroH1: 'ERD — The data model',
+      heroLead: "Six entities and five relationships that serve the Portal's three core flows: work schedule, operational messaging, and leave requests. Every entity derives from a concrete functional requirement in the BRD.",
+      s1Title: 'Relationship diagram',
+      s1P: "The Portal interfaces with existing systems in the organization (Scheduling, HR, Dispatch) and holds only the data required for its own flows. The diagram shows entities and relationships at the conceptual level.",
+      s1Caveat: '<strong>A note on key names (reading the ERD):</strong><br/>As a rule, every FK keeps the <strong>same name</strong> as the PK it points to — for example <code>SHIFT.driver_id</code> points to <code>DRIVER.driver_id</code>, <code>TAXI_REQUEST.shift_id</code> points to <code>SHIFT.shift_id</code>. This ensures every reader knows which link they\'re looking at, without ambiguity.<br/><br/><strong>The exception:</strong> when a table references the same entity in multiple roles, the FK takes a role name — not the entity\'s name. Just as in a legal document "petitioner" and "approver" aren\'t both called "party." In this model:<ul style="margin: 8px 18px 0;"><li style="margin-bottom: 4px;"><code>MESSAGE.sender_id</code> → DRIVER in the role of <strong>sender</strong> (not recipient — those go via ACKNOWLEDGMENT_LOG)</li><li><code>LEAVE_REQUEST.approver_id</code> → DRIVER in the role of <strong>approver</strong> (alongside <code>driver_id</code> who is the <strong>requester</strong>; two rows from the same table to the same target, impossible to identify without role names).</li></ul><br/>The relationship label in the ERD shows the actual FK name ("via sender_id") — so the reader never has to guess how the connection is made.',
+      s2Title: 'Explanation of each entity',
+      e1Tag: 'The driver — the central actor in the model',
+      e1P: "Driver profile: name, employee number (MIRS), depot, phone, and an external link to the HR System. Every flow in the system starts with driver identification. The <code>hr_external_id</code> is the FK to the HR System of Record — we don't hold leave balance or payslips in the Portal, only the key.",
+      e2Tag: 'A single shift of a driver on a given day',
+      e2P: "The daily schedule — each driver can have only one shift per day (UNIQUE on driver+date). The <code>shift_type</code> field handles values: morning, afternoon, night, leave, on-call, standby. <code>instructor_name</code> is populated only for training shifts — keeping the field at the SHIFT level (and not a separate table) is correct because it's shift-dependent, not driver-dependent.",
+      e3Tag: 'Ride request — optionally linked to a shift',
+      e3P: "Not every shift requires a ride. Separating into its own entity lets us update the request's status (created, vehicle assigned, en route, arrived, cancelled) <strong>without touching the shift record</strong> — important because the shift is an operationally stable record, while the request changes frequently.",
+      e4Tag: 'Operational message — sent to a group',
+      e4P: "A single message can be sent to an audience — a specific line, a depot, or all active drivers. <code>audience_filter</code> is stored as a query, not a list — so the audience is recomputed each time (e.g., if a driver is added to a line after the message was sent). <code>requires_ack</code> marks safety messages that require explicit read acknowledgment.",
+      e5Tag: 'Read-receipt log — multi-dimensional',
+      e5P: "This is where I turned an N:M relationship between message and drivers into its own table. Each message goes to a group, and every driver in the group needs to acknowledge it <strong>individually</strong>. Extracting the log into a separate table lets us know who read, when, and on which device — data required for regulatory compliance (BRD Section 8 — privacy) and for incident investigation if needed.",
+      e6Tag: 'Leave request — full lifecycle documentation',
+      e6P: 'Each request is preserved from submission to decision — including negative decisions with reasoning. <code>approver_id</code> links to DRIVER (a manager is also a driver in this model — saves a separate USER table). <code>decision_note</code> is required if <code>status</code> = "denied" — a business rule documented at the DB level, not just the UI.',
+      s2Caveat: '<strong>What is deliberately not in this ERD:</strong> operational tables of the system itself (audit log, session, push_token) — these are infrastructure layer, not part of the business model. They are documented in the separate Technical Spec, not the BRD.',
+      footerP: "Part of Nati Yevarkan's portfolio. Self-initiated analysis, not commissioned by any organization. © 2026"
+    },
+    he: {
+      backLink: '← חזרה ל-Case Study',
+      backLink2: '← חזרה ל-Case Study',
+      pageId: 'DATA',
+      eyebrow: 'Conceptual Data Model',
+      heroH1: 'ERD — מודל הנתונים',
+      heroLead: 'שש ישויות וחמישה יחסים שמשרתים את שלוש הזרימות המרכזיות של ה-Portal: סידור עבודה, הודעות תפעוליות, ובקשות חופשה. כל ישות נגזרת מדרישה תפקודית קונקרטית ב-BRD.',
+      s1Title: 'תרשים הקשרים',
+      s1P: 'ה-Portal מתממשק למערכות הקיימות בארגון (Scheduling, HR, Dispatch) ומחזיק רק את הנתונים הדרושים לזרימות שלו. התרשים מציג את הישויות והיחסים ברמת הקונספט.',
+      s1Caveat: '<strong>הערה על שמות המפתחות (קריאת ה-ERD):</strong><br/>ככלל, כל FK שומר את <strong>אותו שם</strong> כמו ה-PK שאליו הוא מצביע — לדוגמה <code>SHIFT.driver_id</code> מצביע על <code>DRIVER.driver_id</code>, <code>TAXI_REQUEST.shift_id</code> מצביע על <code>SHIFT.shift_id</code>. זה מבטיח שכל קורא מבין באיזה קישור מדובר ללא ספק.<br/><br/><strong>היוצא דופן:</strong> כשטבלה מתייחסת לאותה ישות בכמה תפקידים, ה-FK מקבל שם תפקיד — לא שם הישות. בדיוק כפי שבמסמך משפטי "מבקש" ו"מאשר" לא נקראים שניהם "צד". במודל הזה:<ul style="margin: 8px 18px 0;"><li style="margin-bottom: 4px;"><code>MESSAGE.sender_id</code> ← DRIVER בתפקיד <strong>שולח</strong> (לא נמען — אלה דרך ACKNOWLEDGMENT_LOG)</li><li><code>LEAVE_REQUEST.approver_id</code> ← DRIVER בתפקיד <strong>מאשר</strong> (לצד <code>driver_id</code> שהוא ה<strong>מבקש</strong>; שתי שורות מאותה טבלה לאותו יעד, בלתי אפשרי לזהות בלי שמות תפקיד).</li></ul><br/>בתווית הקשר ב-ERD מופיע השם של ה-FK בפועל ("via sender_id") — כדי שהקורא לעולם לא יצטרך לנחש איך החיבור נעשה.',
+      s2Title: 'הסבר על כל ישות',
+      e1Tag: 'הנהג — הגורם המרכזי במודל',
+      e1P: 'פרופיל הנהג: שם, מספר עובד (MIRS), דיפו, פלאפון, וקישור חיצוני ל-HR System. כל הזרימות במערכת מתחילות מזיהוי הנהג. ה-<code>hr_external_id</code> הוא ה-FK ל-HR System of Record — לא מחזיקים יתרת חופשה או תלוש שכר ב-Portal, רק את המפתח.',
+      e2Tag: 'משמרת בודדת של נהג ביום נתון',
+      e2P: 'סידור היומי — לכל נהג ביום אחד יכולה להיות משמרת אחת בלבד (UNIQUE על שילוב driver+date). שדה <code>shift_type</code> מטפל בערכים: בוקר, צהריים, לילה, חופש, כוננות, מוכן. <code>instructor_name</code> מאוכלס רק במשמרות הדרכה — שמירת השדה ברמת ה-SHIFT (ולא טבלה נפרדת) נכונה כי הוא תלוי-משמרת, לא תלוי-נהג.',
+      e3Tag: 'בקשת הסעה — מקושרת אופציונלית למשמרת',
+      e3P: 'לא כל משמרת דורשת הסעה. הפרדה לישות נפרדת מאפשרת לעדכן את ה-status של הבקשה (נוצרה, שובץ רכב, בדרך, הגיע, בוטל) <strong>בלי לגעת ברשומת המשמרת</strong> — חשוב כי המשמרת היא רשומה יציבה תפעולית, והבקשה משתנה תכופות.',
+      e4Tag: 'הודעה תפעולית — נשלחת לקבוצה',
+      e4P: 'הודעה אחת יכולה להישלח לקהל — קו ספציפי, דיפו, או כל הנהגים הפעילים. <code>audience_filter</code> נשמר כשאילתה, לא כרשימה — כדי שהקהל יחושב מחדש בכל פעם (לדוגמה, אם נהג נוסף לקו אחרי שליחת ההודעה). <code>requires_ack</code> משמש לציון הודעות בטיחות שמחייבות אישור קריאה מפורש.',
+      e5Tag: 'תיעוד אישור קריאה — לוג רב-מימדי',
+      e5P: 'זה הקטע שבו הפכתי קשר N:M בין הודעה לנהגים לטבלה משלו. כל הודעה נשלחת לקבוצה, וכל נהג בקבוצה צריך לאשר אותה <strong>בנפרד</strong>. הוצאת ה-log לטבלה נפרדת מאפשרת לדעת מי קרא, מתי, ועל איזה מכשיר — נתון שדרוש לרגולציה (BRD Section 8 — privacy) ולחקירת תקרית במידה שיש.',
+      e6Tag: 'בקשת חופשה — תיעוד מלא של מחזור החיים',
+      e6P: 'כל בקשה נשמרת מהגשתה ועד החלטה — כולל החלטות שליליות עם נימוק. <code>approver_id</code> מקושר ל-DRIVER (מנהל הוא גם נהג במודל הזה — חוסך טבלת USER נפרדת). <code>decision_note</code> חובה אם <code>status</code> = "נדחתה" — כלל עסקי שמתועד גם ברמת DB ולא רק UI.',
+      s2Caveat: '<strong>מה לא נכלל ב-ERD הזה במכוון:</strong> טבלאות תפעול של המערכת עצמה (audit log, session, push_token) — אלה שכבת תשתית, לא חלק מהמודל העסקי. הם מתועדים ב-Technical Spec הנפרד, לא ב-BRD.',
+      footerP: 'חלק מתיק הפורטפוליו של נתי יברקן. תוצר ניתוח עצמאי, לא מוזמן ע"י אף ארגון. © 2026'
+    }
+  };
+
+  const docMeta = {
+    en: {
+      title: 'ERD · Conceptual Data Model — Driver Portal',
+      description: '6 entities, relationships, and normalization analysis — the ERD explainer for the Driver Portal project.'
+    },
+    he: {
+      title: 'ERD · מודל הנתונים הלוגי — Driver Portal',
+      description: '6 ישויות, יחסים, וניתוח נורמליזציה — דף הסבר ל-ERD של פרויקט Driver Portal.'
+    }
+  };
+
+  function applyLanguage(lang) {
+    const dict = translations[lang];
+    if (!dict) return;
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === 'he') ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if (dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    if (docMeta[lang]) {
+      document.title = docMeta[lang].title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.setAttribute('content', docMeta[lang].description);
+    }
+    const toggle = document.getElementById('langToggle');
+    if (toggle) {
+      toggle.textContent = (lang === 'en') ? 'HE' : 'EN';
+      toggle.setAttribute('aria-label', (lang === 'en') ? 'Switch to Hebrew' : 'Switch to English');
+    }
+    try { localStorage.setItem('siteLang', lang); } catch (e) {}
+  }
+
+  let initialLang = 'en';
+  try {
+    const stored = localStorage.getItem('siteLang');
+    if (stored === 'he' || stored === 'en') initialLang = stored;
+  } catch (e) {}
+  applyLanguage(initialLang);
+
+  const langToggleBtn = document.getElementById('langToggle');
+  if (langToggleBtn) {
+    langToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.lang === 'he' ? 'he' : 'en';
+      applyLanguage(current === 'en' ? 'he' : 'en');
+    });
+  }
+</script>
 
 </body>
 </html>
