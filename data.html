@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Heebo:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <style>
 :root {
   --paper: #FAFAF7; --ink: #14213D; --text: #1F2937; --muted: #6B7280;
@@ -61,6 +62,33 @@ p strong { color: var(--ink); font-weight: 600; }
   height: auto;
   display: block;
   margin: 0 auto;
+}
+.erd-wrap .mermaid {
+  background: transparent;
+  direction: ltr;
+  text-align: center;
+}
+.erd-wrap .mermaid svg {
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 0 auto;
+}
+/* Force ERD text to be visible on the dark theme */
+.erd-wrap .mermaid svg text,
+.erd-wrap .mermaid svg .er.entityLabel,
+.erd-wrap .mermaid svg .er.attributeLabel,
+.erd-wrap .mermaid svg .er.relationshipLabel,
+.erd-wrap .mermaid svg foreignObject {
+  fill: #FDE68A !important;
+  color: #FDE68A !important;
+}
+/* Background pill behind relationship labels — dark so light text shows */
+.erd-wrap .mermaid svg .er.relationshipLabelBox {
+  fill: #0a0e1a !important;
+  stroke: #0a0e1a !important;
+}
+.erd-wrap .mermaid svg .er.relationshipLine {
+  stroke: #FCD34D !important;
 }
 .erd-caption {
   font-family: 'JetBrains Mono', monospace;
@@ -162,9 +190,73 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
     <p data-i18n="s1P">The Portal interfaces with existing systems in the organization (Scheduling, HR, Dispatch) and holds only the data required for its own flows. The diagram shows entities and relationships at the conceptual level.</p>
 
     <div class="erd-wrap">
-      <img src="erd.png" alt="ERD — Conceptual data model, six entities and their relationships" />
+      <pre class="mermaid">
+erDiagram
+    DRIVER {
+        int driver_id PK
+        string name
+        string mirs_id UK
+        string depot
+        string phone
+        string hr_external_id FK
+    }
+    SHIFT {
+        int shift_id PK
+        int driver_id FK
+        date shift_date
+        time start_time
+        time end_time
+        string start_station
+        string shift_type
+        string instructor_name
+    }
+    TAXI_REQUEST {
+        int request_id PK
+        int shift_id FK
+        string pickup_location
+        time pickup_time
+        string vehicle_id
+        string status
+        datetime last_updated
+    }
+    MESSAGE {
+        int message_id PK
+        int sender_id FK
+        string audience_type
+        string audience_filter
+        string body
+        string priority
+        bool requires_ack
+        datetime sent_at
+    }
+    ACKNOWLEDGMENT_LOG {
+        int ack_id PK
+        int message_id FK
+        int driver_id FK
+        datetime read_at
+        datetime acked_at
+        string device_type
+    }
+    LEAVE_REQUEST {
+        int leave_id PK
+        int driver_id FK
+        string type
+        date start_date
+        date end_date
+        string status
+        int approver_id FK
+        string decision_note
+    }
+    DRIVER       ||--o{ SHIFT             : "scheduled-for"
+    SHIFT        ||--o| TAXI_REQUEST      : "may-require"
+    DRIVER       ||--o{ MESSAGE           : "sends (via sender_id)"
+    MESSAGE      ||--o{ ACKNOWLEDGMENT_LOG: "acknowledged-in"
+    DRIVER       ||--o{ ACKNOWLEDGMENT_LOG: "acknowledges"
+    DRIVER       ||--o{ LEAVE_REQUEST     : "requests (via driver_id)"
+    DRIVER       ||--o{ LEAVE_REQUEST     : "approves (via approver_id)"
+      </pre>
     </div>
-    <div class="erd-caption">Figure 1 · Conceptual Entity Relationship Diagram</div>
+    <div class="erd-caption">Figure 1 · Conceptual Entity Relationship Diagram (rendered as code, Mermaid)</div>
 
     <div class="caveat" style="margin-top: 28px;" data-i18n-html="s1Caveat">
       <strong>A note on key names (reading the ERD):</strong><br/>
@@ -400,6 +492,46 @@ footer { padding: 48px 0; font-family: 'JetBrains Mono', monospace; font-size: 1
     langToggleBtn.addEventListener('click', () => {
       const current = document.documentElement.lang === 'he' ? 'he' : 'en';
       applyLanguage(current === 'en' ? 'he' : 'en');
+    });
+  }
+
+  /* Initialize Mermaid ERD — themed to match the dark erd-wrap */
+  if (window.mermaid) {
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        fontFamily: "'JetBrains Mono', monospace",
+        fontSize: '14px',
+        /* Entity title bar */
+        primaryColor: '#1E293B',
+        primaryTextColor: '#F1F5F9',
+        primaryBorderColor: '#FCD34D',
+        mainBkg: '#1E293B',
+        nodeBorder: '#FCD34D',
+        /* Relationship lines + labels */
+        lineColor: '#FCD34D',
+        textColor: '#F1F5F9',
+        edgeLabelBackground: '#0a0e1a',
+        /* ER attribute rows (the fields inside each entity) */
+        attributeBackgroundColorOdd: '#0F172A',
+        attributeBackgroundColorEven: '#1E293B',
+        /* Misc */
+        secondaryColor: '#0F172A',
+        tertiaryColor: '#1E293B',
+        background: '#0a0e1a',
+        clusterBkg: '#0F172A'
+      },
+      er: {
+        diagramPadding: 24,
+        layoutDirection: 'TB',
+        minEntityWidth: 180,
+        minEntityHeight: 80,
+        entityPadding: 16,
+        useMaxWidth: true,
+        stroke: '#FCD34D',
+        fill: '#1E293B'
+      }
     });
   }
 </script>
